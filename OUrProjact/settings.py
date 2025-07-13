@@ -94,11 +94,21 @@ WSGI_APPLICATION = "OUrProjact.wsgi.application"
 #     }
 # }
 #
-
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'stupefied_bose',
+        'USER': 'root',
+        'PASSWORD': 'VVbEIaEqIzHLOn1BN2OB4ypI',
+        'HOST': 'matterhorn.liara.cloud',
+        'PORT': '30931',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
+        'CONN_MAX_AGE': 600,
+    }
 }
-
+# 2. Add the CONN_MAX_AGE setting to the 'default' database configuration.
 DATABASES['default']['CONN_MAX_AGE'] = 600
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

@@ -41,15 +41,8 @@ html {
 }
 
 @font-face {
-  font-family: 'Vazirmatn';
-  src: url('/static/fonts/Vazirmatn-Light.woff2') format('woff2-variations');
-  /*
-    شما می‌توانید محدوده وزن‌هایی که پشتیبانی می‌شود را مشخص کنید:
-    font-weight: 100 900;
-  */
-  font-weight: normal; /* یا هر وزن پیش‌فرض دیگری */
-  font-style: normal;
-  font-display: swap; /* برای بارگذاری بهتر فونت */
+  font-family: 'IRANSans';
+ /* برای بارگذاری بهتر فونت */
 }
 
 body {
@@ -95,10 +88,7 @@ body {
 }
 
 /* Prevent FOIT (Flash of Invisible Text) */
-@font-face {
-    font-family: 'IRANSans';
-    font-display: swap;
-}
+
 
 /* Image optimization */
 img {
