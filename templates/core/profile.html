@@ -18,7 +18,7 @@
                         {% if user.profile_picture %}
                             <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="img-fluid rounded-circle profile-picture">
                         {% else %}
-                            <div class="profile-placeholder">
+                            <div class="profile-placeholder profile-avatar-placeholder rounded-circle">
                                 <i class="fas fa-user"></i>
                             </div>
                         {% endif %}

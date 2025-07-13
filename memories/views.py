@@ -4,9 +4,10 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 from django.urls import reverse
+from django.http import JsonResponse
 
-from .models import Memory
-from .forms import MemoryForm
+from .models import Memory, MemoryImage
+from .forms import MemoryForm, MemoryImageForm
 from core.views import get_partner
 from notifications.models import Notification, create_partner_notification
 
@@ -29,7 +30,13 @@ def memory_detail(request, pk):
         user__in=[request.user, get_partner(request.user)]
     )
     
-    return render(request, 'memories/detail.html', {'memory': memory})
+    # Get all images associated with this memory
+    memory_images = memory.images.all().order_by('order')
+    
+    return render(request, 'memories/detail.html', {
+        'memory': memory,
+        'memory_images': memory_images
+    })
 
 @login_required
 def memory_create(request):
@@ -62,12 +69,13 @@ def memory_create(request):
 def memory_edit(request, pk):
     """Edit an existing memory."""
     memory = get_object_or_404(Memory, pk=pk, user__in=[request.user, get_partner(request.user)])
+    memory_images = memory.images.all().order_by('order')
     
     if request.method == 'POST':
         form = MemoryForm(request.POST, request.FILES, instance=memory)
         if form.is_valid():
             form.save()
-
+            
             # Notify the other user
             if request.user == memory.user:
                 # If the creator edited the memory, notify the partner
@@ -92,6 +100,7 @@ def memory_edit(request, pk):
     return render(request, 'memories/form.html', {
         'form': form,
         'memory': memory,
+        'memory_images': memory_images,
         'title': _('Edit Memory')
     })
 
@@ -143,3 +152,28 @@ def memory_search(request):
         'memories': memories, 
         'query': query
     })
+
+@login_required
+def memory_image_delete(request, pk):
+    """Delete a memory image."""
+    image = get_object_or_404(
+        MemoryImage, 
+        pk=pk, 
+        memory__user__in=[request.user, get_partner(request.user)]
+    )
+    memory_id = image.memory.id
+    
+    if request.method == 'POST':
+        image.delete()
+        messages.success(request, _('Image deleted successfully.'))
+        return redirect('memories:detail', pk=memory_id)
+    
+    # For AJAX requests
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        try:
+            image.delete()
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    
+    return render(request, 'memories/image_delete.html', {'image': image})

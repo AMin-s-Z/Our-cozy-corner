@@ -66,9 +66,9 @@ def complete_activity(request, pk):
     # Notify partner
     create_partner_notification(
         user=request.user,
-        message=f'{request.user.username} completed the activity: {activity.title}',
-        link=reverse('activities:list')
-    )
+            message=f'{request.user.username} completed the activity: {activity.title}',
+            link=reverse('activities:list')
+        )
     
     messages.success(request, _("Congratulations! You have completed '{activity}' and earned {points} points.").format(activity=activity.title, points=activity.points))
     return redirect('activities:list')

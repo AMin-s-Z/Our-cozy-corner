@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-
+import dj_database_url
+from dotenv import load_dotenv
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +28,7 @@ SECRET_KEY = "django-insecure-#04ab($%j@-7n8al-lx6fw5m@#&g22@f7)^qpy=@6!e^wo=kkn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -85,13 +87,16 @@ WSGI_APPLICATION = "OUrProjact.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+#
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(default=os.environ.get("DATABASE_URL"))
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -178,7 +183,7 @@ LOGOUT_REDIRECT_URL = 'login'
 MAX_USERS = 2
 
 # Webhook settings for Telegram notifications via n8n
-N8N_WEBHOOK_URL = "https://n8n-xyqzpcgd.eu-central-1.clawcloudrun.com/webhook/4c62040e-5b91-4499-9f73-dd7697422792"  # جایگزین کنید با آدرس webhook واقعی n8n
+N8N_WEBHOOK_URL = "https://n8n-xyqzpcgd.eu-central-1.clawcloudrun.com/webhook-test/985867df-ee36-465f-9880-01fcb5db0015"
 
 # Logging configuration
 LOGGING = {
@@ -196,16 +201,15 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/notifications.log'),
-            'formatter': 'verbose',
-        },
     },
     'loggers': {
         'notifications': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,
         },

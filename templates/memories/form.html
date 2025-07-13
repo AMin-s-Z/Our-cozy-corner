@@ -252,7 +252,7 @@
                 </div>
                 
                 <div class="mb-4">
-                    <label for="{{ form.location.id_for_label }}" class="form-label">مکان</label>
+                    <label for="{{ form.location.id_for_label }}" class="form-label">مکان (اختیاری)</label>
                     <div class="position-relative">
                         <i class="fas fa-map-marker-alt form-floating-icon"></i>
                         {{ form.location }}
@@ -266,14 +266,18 @@
                     {% endif %}
                 </div>
                 
-                <div class="mb-4">
-                    <label for="{{ form.image.id_for_label }}" class="form-label">تصویر خاطره</label>
-                    <label for="{{ form.image.id_for_label }}" class="custom-file-upload">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="{{ form.image.id_for_label }}" class="form-label">تصویر اصلی (اختیاری)</label>
+                        <label for="{{ form.image.id_for_label }}" class="custom-file-upload" id="mainImageUpload">
                         <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                        <div class="upload-text">برای انتخاب تصویر کلیک کنید یا تصویر را اینجا رها کنید</div>
-                        <div class="small text-muted mt-2">فرمت‌های پشتیبانی شده: JPG، PNG، GIF</div>
+                            <div class="upload-text">انتخاب تصویر اصلی</div>
+                            <div class="small text-muted mt-1">برای انتخاب کلیک کنید</div>
                     </label>
                     {{ form.image }}
+                        {% if form.image.help_text %}
+                            <div class="form-text small">{{ form.image.help_text }}</div>
+                        {% endif %}
                     {% if form.image.errors %}
                         <div class="text-danger mt-1 small">
                             {% for error in form.image.errors %}
@@ -281,18 +285,46 @@
                             {% endfor %}
                         </div>
                     {% endif %}
-                    
-                    {% if memory and memory.image %}
-                        <div class="mt-3">
-                            <p class="mb-2 text-muted">تصویر فعلی:</p>
-                            <img src="{{ memory.image.url }}" alt="{{ memory.title }}" class="preview-image shadow-sm">
+                        <div id="mainImagePreview" class="mt-3 text-center" style="display: none;">
+                            <img src="#" class="preview-image img-fluid" alt="تصویر پیش‌نمایش">
+                            <button type="button" class="btn btn-sm btn-outline-danger mt-2" id="removeMainImage">
+                                <i class="fas fa-times me-1"></i> حذف تصویر
+                            </button>
                         </div>
-                    {% endif %}
-                    <div id="imagePreview" class="mt-3 d-none">
-                        <p class="mb-2 text-muted">پیش نمایش:</p>
-                        <img id="previewImg" src="#" alt="پیش نمایش" class="preview-image shadow-sm">
+                        {% if memory.image %}
+                            <div class="mt-3 text-center" id="existingMainImage">
+                                <img src="{{ memory.image.url }}" class="preview-image img-fluid" alt="{{ memory.title }}">
+                                <div class="mt-2">تصویر فعلی</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    
+                </div>
+                
+                {% if memory_images %}
+                <div class="mb-4">
+                    <label class="form-label">تصاویر فعلی</label>
+                    <div class="row">
+                        {% for img in memory_images %}
+                        <div class="col-6 col-md-3 mb-3">
+                            <div class="card h-100">
+                                <img src="{{ img.image.url }}" class="card-img-top" alt="{{ img.caption|default:memory.title }}">
+                                <div class="card-body p-2">
+                                    <p class="card-text small text-muted mb-2">{{ img.caption|default:"بدون توضیح" }}</p>
+                                    <form method="post" action="{% url 'memories:image_delete' img.id %}" class="d-grid">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash-alt me-1"></i> حذف
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
+                {% endif %}
                 
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                     <a href="{% url 'memories:list' %}" class="btn btn-outline-secondary rounded-pill px-4">انصراف</a>
@@ -307,169 +339,182 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://unpkg.com/persian-date@1.1.0/dist/persian-date.min.js"></script>
 <script src="https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://unpkg.com/persian-date@1.1.0/dist/persian-date.min.js"></script>
+<script src="https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
 <script>
-    // Image preview
-    $(document).ready(function() {
-        console.log("jQuery ready in memories form");
-        const $imageInput = $('#{{ form.image.id_for_label }}');
-        const $imagePreview = $('#imagePreview');
-        const $previewImg = $('#previewImg');
-        const $uploadText = $('.upload-text');
-        const $uploadIcon = $('.upload-icon');
-        
-        if ($imageInput.length > 0) {
-            $imageInput.on('change', function() {
-                if (this.files && this.files[0]) {
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        $previewImg.attr('src', e.target.result);
-                        $imagePreview.removeClass('d-none');
-                        $uploadText.text(this.files[0].name);
-                        $uploadIcon.removeClass('fa-cloud-upload-alt').addClass('fa-check-circle');
-                        $uploadIcon.css('color', 'var(--primary-color)');
-                    }.bind(this);
-                    
-                    reader.readAsDataURL(this.files[0]);
-                } else {
-                    $imagePreview.addClass('d-none');
-                    $uploadText.text('برای انتخاب تصویر کلیک کنید یا تصویر را اینجا رها کنید');
-                    $uploadIcon.addClass('fa-cloud-upload-alt').removeClass('fa-check-circle');
-                    $uploadIcon.css('color', '#aaa');
-                }
-            });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Persian Date Picker
+        const dateInput = document.getElementById('id_date');
+        const datePickerInput = document.getElementById('date_picker_input');
+
+        // Set initial value for the date picker input if a date is already set
+        if (dateInput.value) {
+            const date = new Date(dateInput.value);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            datePickerInput.value = `${year}/${month}/${day}`;
         }
-        
-        // Add form-control-icon class to inputs with floating icons
-        $('.form-floating-icon').each(function() {
-            const $input = $(this).next();
-            if ($input.length > 0) {
-                $input.addClass('form-control-icon');
+
+        $(datePickerInput).persianDatepicker({
+            format: 'YYYY/MM/DD',
+            initialValue: dateInput.value ? true : false,
+            autoClose: true,
+            onSelect: function(unix) {
+                const date = new Date(unix);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                dateInput.value = `${year}-${month}-${day}`;
             }
         });
-        
-        // Handle mood icons with jQuery
-        const $moodSelect = $('#{{ form.mood.id_for_label }}');
-        const $moodIcons = $('.mood-icon-item');
-        
-        // Set initial active state
-        if ($moodSelect.length > 0 && $moodIcons.length > 0) {
-            const currentValue = $moodSelect.val();
-            $moodIcons.each(function() {
-                if ($(this).data('value') === currentValue) {
-                    $(this).addClass('active');
-                }
-            });
-            
-            // Add click handlers
-            $moodIcons.on('click', function() {
-                const value = $(this).data('value');
-                
-                // Update select value and trigger change
-                $moodSelect.val(value).trigger('change');
-                
-                // Update active state
-                $moodIcons.removeClass('active');
-                $(this).addClass('active');
-                
-                // Log for debugging
-                console.log('Mood changed to:', value);
-            });
-            
-            // Also listen for changes on the select itself
-            $moodSelect.on('change', function() {
-                const currentValue = $(this).val();
-                $moodIcons.each(function() {
-                    if ($(this).data('value') === currentValue) {
-                        $(this).addClass('active');
-                    } else {
-                        $(this).removeClass('active');
-                    }
-                });
-            });
-        }
-        
-        // Initialize Gregorian Date Picker with jQuery
-        try {
-            // Hide the original date input
-            $('#{{ form.date.id_for_label }}').hide();
-            
-            // Get the current value from the hidden input if it exists
-            const currentValue = $('#{{ form.date.id_for_label }}').val();
-            
-            // Initialize the date picker on the visible input
-            $('#date_picker_input').pDatepicker({
-                format: 'YYYY/MM/DD',
-                autoClose: true,
-                initialValue: false,
-                calendar: {
-                    gregorian: {
-                        locale: 'en'
-                    }
-                },
-                calendarType: 'gregorian',
-                onlySelectOnDate: true,
-                timePicker: {
-                    enabled: false
-                },
-                toolbox: {
-                    calendarSwitch: {
-                        enabled: false
-                    }
-                },
-                persianDigit: false,
-                observer: true,
-                responsive: true,
-                position: 'auto',
-                onSelect: function(unix) {
-                    console.log("Date selected", unix);
-                    
-                    // Format date for Django (YYYY-MM-DD)
-                    const date = new Date(unix);
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const formattedDate = `${year}-${month}-${day}`;
-                    
-                    // Update the hidden input with the formatted date
-                    $('#{{ form.date.id_for_label }}').val(formattedDate);
-                    
-                    // Show the selected date in the visible input
-                    const readableDate = `${year}/${month}/${day}`;
-                    $('#date_picker_input').val(readableDate);
-                },
-                onShow: function() {
-                    $('.datepicker-plot-area').css('z-index', '9999');
-                }
-            });
-            
-            // If there's an existing value, display it in Gregorian format
-            if (currentValue) {
-                const dateParts = currentValue.split('-');
-                if (dateParts.length === 3) {
-                    // Create a gregorian date
-                    const gregorianDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-                    const year = gregorianDate.getFullYear();
-                    const month = String(gregorianDate.getMonth() + 1).padStart(2, '0');
-                    const day = String(gregorianDate.getDate()).padStart(2, '0');
-                    
-                    // Display in YYYY/MM/DD format
-                    $('#date_picker_input').val(`${year}/${month}/${day}`);
-                    
-                    // Also initialize the date picker with this value
-                    setTimeout(function() {
-                        $('#date_picker_input').pDatepicker('setDate', gregorianDate.valueOf());
-                    }, 500);
-                }
+
+        // Initialize mood selector
+        const moodInput = document.getElementById('id_mood');
+        const moodIcons = document.querySelectorAll('.mood-icon-item');
+
+        // Set initial active mood icon
+        if (moodInput.value) {
+            const activeMoodIcon = document.querySelector(`.mood-icon-item[data-value="${moodInput.value}"]`);
+            if (activeMoodIcon) {
+                activeMoodIcon.classList.add('active');
             }
-            
-            console.log("Gregorian date picker initialized in memories");
-        } catch (e) {
-            console.error("Error initializing date picker:", e);
+        } else {
+            // Default to 'content' mood
+            const defaultMoodIcon = document.querySelector('.mood-icon-item[data-value="content"]');
+            if (defaultMoodIcon) {
+                defaultMoodIcon.classList.add('active');
+                moodInput.value = 'content';
+            }
         }
+
+        // Add click event to mood icons
+        moodIcons.forEach(function(icon) {
+            icon.addEventListener('click', function() {
+                // Remove active class from all icons
+                moodIcons.forEach(function(i) {
+                    i.classList.remove('active');
+                });
+
+                // Add active class to clicked icon
+                this.classList.add('active');
+
+                // Set the value of the hidden input
+                moodInput.value = this.getAttribute('data-value');
+            });
+        });
+
+        // Main image preview
+        const mainImageInput = document.getElementById('id_image');
+        const mainImageUpload = document.getElementById('mainImageUpload');
+        const mainImagePreview = document.getElementById('mainImagePreview');
+        const previewImage = mainImagePreview.querySelector('.preview-image');
+        const removeMainImageBtn = document.getElementById('removeMainImage');
+        const existingMainImage = document.getElementById('existingMainImage');
+
+        mainImageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    mainImagePreview.style.display = 'block';
+
+                    // Hide the existing image if present
+                    if (existingMainImage) {
+                        existingMainImage.style.display = 'none';
+                    }
+
+                    // Change the upload label text
+                    const uploadText = mainImageUpload.querySelector('.upload-text');
+                    uploadText.textContent = 'تغییر تصویر';
+                };
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Remove main image
+        if (removeMainImageBtn) {
+            removeMainImageBtn.addEventListener('click', function() {
+                mainImageInput.value = '';
+                mainImagePreview.style.display = 'none';
+
+                // Show the existing image if present
+                if (existingMainImage) {
+                    existingMainImage.style.display = 'block';
+                }
+
+                // Reset the upload label text
+                const uploadText = mainImageUpload.querySelector('.upload-text');
+                uploadText.textContent = 'انتخاب تصویر اصلی';
+            });
+        }
+
+        // Additional images preview
+        const additionalImagesInput = document.getElementById('id_additional_images');
+        const additionalImagesPreview = document.getElementById('additionalImagesPreview');
+        const additionalImagesContainer = document.getElementById('additionalImagesContainer');
+
+        additionalImagesInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                // Clear previous previews
+                additionalImagesContainer.innerHTML = '';
+
+                // Create previews for each selected file
+                for (let i = 0; i < this.files.length; i++) {
+                    const file = this.files[i];
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        const col = document.createElement('div');
+                        col.className = 'col-6 col-md-4 mb-3';
+
+                        const card = document.createElement('div');
+                        card.className = 'card h-100';
+
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'card-img-top';
+                        img.alt = 'تصویر پیش‌نمایش';
+                        img.style.height = '120px';
+                        img.style.objectFit = 'cover';
+
+                        const cardBody = document.createElement('div');
+                        cardBody.className = 'card-body p-2';
+
+                        const fileName = document.createElement('p');
+                        fileName.className = 'card-text small text-muted mb-0';
+                        fileName.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+
+                        cardBody.appendChild(fileName);
+                        card.appendChild(img);
+                        card.appendChild(cardBody);
+                        col.appendChild(card);
+                        additionalImagesContainer.appendChild(col);
+                    };
+
+                    reader.readAsDataURL(file);
+                }
+
+                additionalImagesPreview.style.display = 'block';
+
+                // Change the upload label text
+                const uploadText = document.querySelector('#additionalImagesUpload .upload-text');
+                uploadText.textContent = `${this.files.length} تصویر انتخاب شده`;
+            } else {
+                additionalImagesPreview.style.display = 'none';
+
+                // Reset the upload label text
+                const uploadText = document.querySelector('#additionalImagesUpload .upload-text');
+                uploadText.textContent = 'انتخاب چند تصویر';
+            }
+        });
     });
 </script>
-{% endblock %} 
+{% endblock %}

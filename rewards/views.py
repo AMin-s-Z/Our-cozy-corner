@@ -41,9 +41,9 @@ def redeem_reward(request, pk):
         # Notify partner
         create_partner_notification(
             user=request.user,
-            message=f'{request.user.username} redeemed a reward: {reward_to_redeem.title}',
-            link=reverse('rewards:list')
-        )
+                message=f'{request.user.username} redeemed a reward: {reward_to_redeem.title}',
+                link=reverse('rewards:list')
+            )
         
         messages.success(request, _("You have successfully redeemed '{reward}'!").format(reward=reward_to_redeem.title))
     else:

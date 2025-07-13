@@ -18,7 +18,9 @@ class Memory(models.Model):
     
     title = models.CharField(_('عنوان'), max_length=200)
     content = models.TextField(_('متن خاطره'))
-    image = models.ImageField(_('تصویر'), upload_to='memories/', blank=True, null=True)
+    # Keep the single image field for backward compatibility, but mark as deprecated
+    image = models.ImageField(_('تصویر (قدیمی)'), upload_to='memories/', blank=True, null=True, 
+                            help_text=_('این فیلد برای سازگاری با نسخه‌های قبلی حفظ شده است. لطفاً از قابلیت آپلود چند تصویر استفاده کنید.'))
     mood = models.CharField(_('حس و حال'), max_length=20, choices=MOOD_CHOICES, default='content')
     date = models.DateField(_('تاریخ'))
     location = models.CharField(_('مکان'), max_length=255, blank=True, null=True)
@@ -66,3 +68,32 @@ class Memory(models.Model):
             'neutral': 'text-secondary',
         }
         return colors.get(self.mood, 'text-dark')
+        
+    @property
+    def primary_image(self):
+        """Return the first image or the legacy image."""
+        images = self.images.all()
+        if images.exists():
+            return images.first().image
+        return self.image
+
+
+class MemoryImage(models.Model):
+    """Model for storing multiple images for a memory."""
+    memory = models.ForeignKey(
+        Memory,
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name=_('خاطره')
+    )
+    image = models.ImageField(_('تصویر'), upload_to='memories/')
+    caption = models.CharField(_('توضیح تصویر'), max_length=255, blank=True, null=True)
+    order = models.PositiveIntegerField(_('ترتیب'), default=0)
+    
+    class Meta:
+        verbose_name = _('تصویر خاطره')
+        verbose_name_plural = _('تصاویر خاطرات')
+        ordering = ['order', 'id']
+    
+    def __str__(self):
+        return f"{self.memory.title} - تصویر {self.order + 1}"

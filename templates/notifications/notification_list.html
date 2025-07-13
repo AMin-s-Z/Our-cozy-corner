@@ -1,25 +1,72 @@
 {% extends "base/base.html" %}
+{% load static %}
 
-{% block title %}Notifications{% endblock %}
+{% block title %}نوتیفیکیشن‌ها | OUrLove{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Notifications</h1>
-        <a href="{% url 'notifications:mark_all_as_read' %}" class="btn btn-primary">Mark all as read</a>
+        <h1 class="h3 mb-0">نوتیفیکیشن‌ها</h1>
+        <div class="d-flex gap-2">
+            <a href="{% url 'notifications:test_webhook' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-tools me-1"></i> تست وب‌هوک
+            </a>
+            <a href="{% url 'notifications:mark_all_as_read' %}" class="btn btn-primary">
+                <i class="fas fa-check-double me-1"></i> خواندن همه
+            </a>
+        </div>
     </div>
 
-    <ul class="list-group">
-        {% for notification in notifications %}
-            <li class="list-group-item {% if not notification.is_read %}list-group-item-info{% endif %}">
-                <a href="{% url 'notifications:mark_as_read' notification.id %}" class="text-decoration-none">
-                    <p>{{ notification.message }}</p>
-                    <small class="text-muted">{{ notification.timestamp|timesince }} ago</small>
-                </a>
-            </li>
-        {% empty %}
-            <li class="list-group-item">You have no notifications.</li>
-        {% endfor %}
-    </ul>
+    <div class="card shadow border-0">
+        <div class="list-group list-group-flush">
+            {% for notification in notifications %}
+                <div class="list-group-item {% if not notification.is_read %}unread-notification{% endif %}">
+                    <a href="{% url 'notifications:mark_as_read' notification.id %}" class="text-decoration-none d-block p-2">
+                        <div class="d-flex align-items-center">
+                            <div class="notification-icon-wrapper me-3">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="notification-content">
+                                <p class="mb-1">{{ notification.message }}</p>
+                                <small class="text-muted">{{ notification.timestamp|timesince }} پیش</small>
+                            </div>
+                            {% if not notification.is_read %}
+                                <span class="ms-auto badge bg-primary rounded-pill">جدید</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="list-group-item text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-bell-slash fa-3x text-muted"></i>
+                    </div>
+                    <p class="mb-0">شما هیچ نوتیفیکیشنی ندارید.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
+
+<style>
+    .notification-icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgba(255, 64, 129, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+    }
+    
+    .unread-notification {
+        border-left: 3px solid var(--primary-color);
+        background-color: rgba(255, 64, 129, 0.05);
+    }
+    
+    .list-group-item:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+</style>
 {% endblock %}

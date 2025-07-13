@@ -51,13 +51,17 @@
                     {% endfor %}
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-center view-all" href="{% url 'notifications:notification_list' %}">مشاهده همه</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-center" href="{% url 'notifications:test_webhook' %}">
+                        <i class="fas fa-tools me-1"></i> تست وب‌هوک
+                    </a></li>
                 </ul>
             </div>
 
             <div class="dropdown">
                 <button class="btn btn-link text-decoration-none dropdown-toggle p-0 user-dropdown-btn" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     {% if user.profile_picture %}
-                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="rounded-circle profile-avatar" width="40" height="40">
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="rounded-circle profile-avatar" style="width: 40px; height: 40px; object-fit: cover;">
                     {% else %}
                         <div class="profile-avatar rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                             <i class="fas fa-user"></i>
@@ -74,7 +78,14 @@
                     <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user-circle me-2"></i> پروفایل</a></li>
                     <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> تنظیمات</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i> خروج</a></li>
+                    <li>
+                        <form method="post" action="{% url 'logout' %}" id="logout-form" class="m-0">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="fas fa-sign-out-alt me-2"></i> خروج
+                            </button>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -195,6 +206,12 @@
         transition: all 0.2s ease;
         background: linear-gradient(45deg, var(--primary-light), var(--primary-color));
         color: white;
+        aspect-ratio: 1/1;
+        object-fit: cover;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .user-dropdown-btn:hover .profile-avatar {
@@ -239,5 +256,15 @@
                 navbar.classList.remove('scrolled');
             }
         });
+        
+        // Ensure logout form is properly submitted
+        const logoutForm = document.getElementById('logout-form');
+        if (logoutForm) {
+            const logoutButton = logoutForm.querySelector('button');
+            logoutButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutForm.submit();
+            });
+        }
     });
 </script>

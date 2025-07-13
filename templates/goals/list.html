@@ -68,10 +68,10 @@
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-circle me-2">
                                         {% if goal.created_by.profile_picture %}
-                                            <img src="{{ goal.created_by.profile_picture.url }}" alt="{{ goal.created_by.username }}" class="rounded-circle" width="24" height="24">
+                                            <img src="{{ goal.created_by.profile_picture.url }}" alt="{{ goal.created_by.username }}" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
                                         {% else %}
-                                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
-                                                <i class="fas fa-user small"></i>
+                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width: 24px; height: 24px; font-size: 12px;">
+                                                <i class="fas fa-user"></i>
                                             </div>
                                         {% endif %}
                                     </div>

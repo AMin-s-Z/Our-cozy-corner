@@ -51,9 +51,9 @@ def goal_create(request):
             # Notify partner
             create_partner_notification(
                 user=request.user,
-                message=f'{request.user.username} created a new goal: {goal.title}',
-                link=reverse('goals:detail', kwargs={'pk': goal.pk})
-            )
+                    message=f'{request.user.username} created a new goal: {goal.title}',
+                    link=reverse('goals:detail', kwargs={'pk': goal.pk})
+                )
 
             messages.success(request, _('Goal created successfully.'))
             return redirect('goals:detail', pk=goal.pk)

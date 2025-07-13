@@ -12,22 +12,92 @@
     </div>
     
     <div class="card border-0 shadow-sm overflow-hidden mb-4">
-        {% if memory.image %}
+        {% if memory.image or memory_images %}
             <div class="position-relative">
-                <img src="{{ memory.image.url }}" class="img-fluid w-100 memory-detail-image" alt="{{ memory.title }}">
+                <!-- Main image display -->
+                <div id="memoryCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% if memory.image %}
+                            <div class="carousel-item active">
+                                <img src="{{ memory.image.url }}" class="d-block w-100 memory-detail-image" alt="{{ memory.title }}">
+                            </div>
+                        {% endif %}
+                        
+                        {% for img in memory_images %}
+                            <div class="carousel-item {% if not memory.image and forloop.first %}active{% endif %}">
+                                <img src="{{ img.image.url }}" class="d-block w-100 memory-detail-image" alt="{{ img.caption|default:memory.title }}">
+                                {% if img.caption %}
+                                    <div class="carousel-caption d-none d-md-block">
+                                        <p class="bg-dark bg-opacity-50 p-2 rounded">{{ img.caption }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if memory.image or memory_images.count > 1 %}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#memoryCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">قبلی</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#memoryCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">بعدی</span>
+                        </button>
+                    {% endif %}
+                </div>
+                
+                <!-- Mood badge -->
                 <div class="position-absolute top-0 end-0 m-3">
                     <span class="badge bg-white text-dark rounded-pill px-3 py-2 shadow-sm">
                         <i class="far {{ memory.get_mood_icon }} {{ memory.get_mood_color }} me-1"></i>
                         {{ memory.get_mood_display }}
                     </span>
                 </div>
+                
+                <!-- Image counter badge -->
+                <div class="position-absolute bottom-0 start-0 m-3">
+                    <span class="badge bg-dark bg-opacity-75 rounded-pill px-3 py-2">
+                        <i class="fas fa-images me-1"></i>
+                        {% with total_images=memory_images.count %}
+                            {{ total_images|add:"1" }} تصویر
+                        {% endwith %}
+                    </span>
+                </div>
             </div>
+            
+            <!-- Thumbnail gallery for multiple images -->
+            {% if memory.image or memory_images.count > 1 %}
+                <div class="image-thumbnails p-2 bg-light">
+                    <div class="d-flex overflow-auto">
+                        {% if memory.image %}
+                            <div class="thumbnail-item me-2 active" data-bs-target="#memoryCarousel" data-bs-slide-to="0">
+                                <img src="{{ memory.image.url }}" class="img-thumbnail" alt="{{ memory.title }}">
+                            </div>
+                        {% endif %}
+                        
+                        {% for img in memory_images %}
+                            <div class="thumbnail-item me-2" data-bs-target="#memoryCarousel" data-bs-slide-to="{{ forloop.counter }}{% if memory.image %}{% else %}{{ forloop.counter0 }}{% endif %}">
+                                <img src="{{ img.image.url }}" class="img-thumbnail" alt="{{ img.caption|default:memory.title }}">
+                                {% if memory.user == request.user %}
+                                    <form method="post" action="{% url 'memories:image_delete' img.id %}" class="delete-image-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger delete-image-btn">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
         {% endif %}
         
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h3 mb-0">{{ memory.title }}</h1>
-                {% if not memory.image %}
+                {% if not memory.image and not memory_images %}
                     <span class="badge bg-light text-dark rounded-pill px-3 py-2">
                         <i class="far {{ memory.get_mood_icon }} {{ memory.get_mood_color }} me-1"></i>
                         {{ memory.get_mood_display }}
@@ -73,9 +143,9 @@
                 <div class="d-flex align-items-center">
                     <div class="avatar-circle me-2">
                         {% if memory.user.profile_picture %}
-                            <img src="{{ memory.user.profile_picture.url }}" alt="{{ memory.user.username }}" class="rounded-circle" width="32" height="32">
+                            <img src="{{ memory.user.profile_picture.url }}" alt="{{ memory.user.username }}" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
                         {% else %}
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px;">
                                 <i class="fas fa-user"></i>
                             </div>
                         {% endif %}
@@ -125,5 +195,96 @@
     .memory-meta {
         border-right: 4px solid var(--primary-color);
     }
+    
+    /* Thumbnail gallery styling */
+    .image-thumbnails {
+        border-top: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .thumbnail-item {
+        width: 80px;
+        height: 60px;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+    }
+    
+    .thumbnail-item.active {
+        border-color: var(--primary-color);
+    }
+    
+    .thumbnail-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .delete-image-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    
+    .thumbnail-item:hover .delete-image-btn {
+        opacity: 1;
+    }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize thumbnail gallery
+        const thumbnails = document.querySelectorAll('.thumbnail-item');
+        thumbnails.forEach(function(thumb) {
+            thumb.addEventListener('click', function() {
+                thumbnails.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // AJAX image deletion
+        const deleteForms = document.querySelectorAll('.delete-image-form');
+        deleteForms.forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (confirm('آیا از حذف این تصویر اطمینان دارید؟')) {
+                    const formData = new FormData(form);
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Remove the thumbnail and refresh the carousel
+                            form.closest('.thumbnail-item').remove();
+                            location.reload(); // Simple solution to refresh the carousel
+                        } else {
+                            alert('خطا در حذف تصویر: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('خطا در ارتباط با سرور');
+                    });
+                }
+            });
+        });
+    });
+</script>
 {% endblock %} 

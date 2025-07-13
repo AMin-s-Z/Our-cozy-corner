@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
+from django.contrib.auth import logout
 import json
 
 from .models import User
@@ -19,40 +20,38 @@ def index(request):
     return render(request, 'core/index.html')
 
 def register(request):
-    """Registration view."""
-    # Check if we already have max users registered
+    """User registration view."""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    
+    # Check if max users reached
     if User.objects.count() >= settings.MAX_USERS:
-        messages.error(request, _("Registration is closed. Maximum number of users reached."))
+        messages.error(request, _("Maximum number of users reached. Registration is closed."))
         return redirect('login')
-        
+    
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST, request.FILES)
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            
-            # Assign partner type
-            if User.objects.count() == 0:
-                user.partner_type = 'partner1'
-            else:
-                user.partner_type = 'partner2'
-            
-            user.save()
-            
-            # Notify the other user
-            other_user = User.objects.exclude(pk=user.pk).first()
-            if other_user:
-                Notification.objects.create(
-                    recipient=other_user,
-                    message=f'{user.username} has joined!',
-                    link=reverse('profile')
-                )
-
-            messages.success(request, _("Account created successfully. Please log in."))
+            user = form.save()
+            messages.success(request, _("Registration successful. You can now log in."))
             return redirect('login')
     else:
         form = UserRegistrationForm()
     
     return render(request, 'core/register.html', {'form': form})
+
+def get_partner(user):
+    """Get the partner of the current user."""
+    if user.partner_type == 'partner1':
+        return User.objects.filter(partner_type='partner2').first()
+    else:
+        return User.objects.filter(partner_type='partner1').first()
+
+def custom_logout(request):
+    """Custom logout view to handle both GET and POST requests."""
+    logout(request)
+    messages.success(request, _("You have been successfully logged out."))
+    return redirect('login')
 
 @login_required
 def dashboard(request):
@@ -170,18 +169,6 @@ def service_worker(request):
         response['Service-Worker-Allowed'] = '/'
         return response
 
-def get_partner(user):
-    """Helper function to get the partner of a user."""
-    if not user:
-        return None
-        
-    partner_type = 'partner2' if user.partner_type == 'partner1' else 'partner1'
-    try:
-        # Filter by partner_type and exclude the current user to ensure we get the right partner
-        return User.objects.filter(partner_type=partner_type).exclude(id=user.id).first()
-    except User.DoesNotExist:
-        return None
-        
 def offline(request):
     """Offline page view."""
     return render(request, 'core/offline.html')

@@ -40,12 +40,25 @@ html {
     scroll-behavior: smooth;
 }
 
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/static/fonts/Vazirmatn-Light.woff2') format('woff2-variations');
+  /*
+    شما می‌توانید محدوده وزن‌هایی که پشتیبانی می‌شود را مشخص کنید:
+    font-weight: 100 900;
+  */
+  font-weight: normal; /* یا هر وزن پیش‌فرض دیگری */
+  font-style: normal;
+  font-display: swap; /* برای بارگذاری بهتر فونت */
+}
+
 body {
-    font-family: IRANSans, serif;
-    background-color: #f8f9fa;
-    color: var(--dark-color);
-    overflow-x: hidden;
-    text-rendering: optimizeSpeed;
+  /* نام فونت به 'Vazirmatn' تغییر کرد و یک فونت جایگزین مناسب (sans-serif) اضافه شد */
+  font-family: Vazirmatn, sans-serif;
+  background-color: #f8f9fa;
+  color: var(--dark-color);
+  overflow-x: hidden;
+  text-rendering: optimizeSpeed;
 }
 
 /* Modern scrollbar */
@@ -106,6 +119,24 @@ img.lazy {
 
 img:not(.lazy) {
     opacity: 1;
+}
+
+/* Profile avatars */
+.profile-avatar,
+img.rounded-circle {
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.profile-avatar-placeholder {
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(45deg, var(--primary-light), var(--primary-color));
+    color: white;
+    overflow: hidden;
 }
 
 /* PWA specific styles */

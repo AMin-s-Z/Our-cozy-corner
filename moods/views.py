@@ -70,9 +70,9 @@ def mood_create(request):
             # Notify partner
             create_partner_notification(
                 user=request.user,
-                message=f'{request.user.username} has set their mood for today.',
-                link=reverse('moods:detail', kwargs={'pk': mood.pk})
-            )
+                    message=f'{request.user.username} has set their mood for today.',
+                    link=reverse('moods:detail', kwargs={'pk': mood.pk})
+                )
 
             messages.success(request, _('حال و هوای شما با موفقیت ثبت شد.'))
             return redirect('moods:list')

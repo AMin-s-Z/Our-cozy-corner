@@ -40,6 +40,15 @@ html {
     scroll-behavior: smooth;
 }
 
+@font-face {
+    font-family: 'IRANSans';
+    /*src: url('/static/fonts/IRANSans.woff2') format('woff2'),*/
+    /*     url('/static/fonts/IRANSans.woff') format('woff'),*/
+    /*     url('/static/fonts/irsans.ttf') format('truetype');*/
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     font-family: IRANSans, serif;
     background-color: #f8f9fa;
@@ -106,6 +115,24 @@ img.lazy {
 
 img:not(.lazy) {
     opacity: 1;
+}
+
+/* Profile avatars */
+.profile-avatar,
+img.rounded-circle {
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.profile-avatar-placeholder {
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(45deg, var(--primary-light), var(--primary-color));
+    color: white;
+    overflow: hidden;
 }
 
 /* PWA specific styles */
