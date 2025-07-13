@@ -1,0 +1,243 @@
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'dashboard' %}">
+            <svg width="36" height="36" viewBox="0 0 192 192" class="me-2 logo-animation">
+                <defs>
+                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#FF4081" />
+                        <stop offset="100%" stop-color="#FF9E80" />
+                    </linearGradient>
+                </defs>
+                <circle cx="96" cy="96" r="88" fill="url(#logoGradient)"/>
+                <path d="M96 48C78.33 48 64 62.33 64 80c0 24.3 32 59.8 32 59.8s32-35.5 32-59.8c0-17.67-14.33-32-32-32zm0 44c-6.63 0-12-5.37-12-12s5.37-12 12-12 12 5.37 12 12-5.37 12-12 12z" fill="white"/>
+            </svg>
+            <div class="logo-text">
+                <span class="logo-text-primary fw-bold"> گوشه </span><span class="logo-text-secondary"> دنج ما </span>
+            </div>
+        </a>
+
+        <div class="ms-auto d-flex align-items-center">
+            <div class="dropdown me-3">
+                <a class="text-decoration-none position-relative notification-icon" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-bell fs-5"></i>
+                    {% if unread_notifications_count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
+                            {{ unread_notifications_count }}
+                            <span class="visually-hidden">unread messages</span>
+                        </span>
+                    {% endif %}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown">
+                    <li class="dropdown-header text-center">
+                        <h6 class="mb-0">اعلان‌ها</h6>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    {% for notification in recent_notifications %}
+                        <li>
+                            <a class="dropdown-item notification-item {% if not notification.is_read %}unread{% endif %}" href="{% url 'notifications:mark_as_read' notification.id %}">
+                                <div class="d-flex align-items-center">
+                                    <div class="notification-icon-wrapper me-2">
+                                        <i class="fas fa-bell text-primary"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="mb-0">{{ notification.message }}</p>
+                                        <small class="text-muted">{{ notification.created_at|timesince }}</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    {% empty %}
+                        <li><div class="dropdown-item text-center py-3">اعلان جدیدی ندارید</div></li>
+                    {% endfor %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-center view-all" href="{% url 'notifications:notification_list' %}">مشاهده همه</a></li>
+                </ul>
+            </div>
+
+            <div class="dropdown">
+                <button class="btn btn-link text-decoration-none dropdown-toggle p-0 user-dropdown-btn" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="rounded-circle profile-avatar" width="40" height="40">
+                    {% else %}
+                        <div class="profile-avatar rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="userDropdown">
+                    <li class="dropdown-header text-center">
+                        <div class="user-info mb-2">
+                            <h6 class="mb-0">{{ user.get_full_name }}</h6>
+                            <small class="text-muted">{{ user.email }}</small>
+                        </div>
+                    </li>
+                    <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user-circle me-2"></i> پروفایل</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> تنظیمات</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i> خروج</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<style>
+    /* Navbar styling */
+    .navbar {
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+    
+    .navbar.scrolled {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+    
+    /* Logo animation */
+    .logo-animation {
+        transition: transform 0.3s ease;
+    }
+    
+    .navbar-brand:hover .logo-animation {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    .logo-text {
+        transition: transform 0.3s ease;
+    }
+    
+    .navbar-brand:hover .logo-text {
+        transform: translateX(5px);
+    }
+    
+    .logo-text-primary {
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+    
+    .logo-text-secondary {
+        color: var(--secondary-color);
+    }
+    
+    /* Notification styling */
+    .notification-icon {
+        color: #555;
+        transition: all 0.2s ease;
+        padding: 8px;
+        border-radius: 50%;
+    }
+    
+    .notification-icon:hover {
+        color: var(--primary-color);
+        background-color: rgba(255, 64, 129, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .notification-badge {
+        transform: translate(-50%, -30%) scale(0.9);
+        box-shadow: 0 2px 5px rgba(220, 53, 69, 0.5);
+        transition: transform 0.2s ease;
+    }
+    
+    .notification-icon:hover .notification-badge {
+        transform: translate(-50%, -30%) scale(1.1);
+    }
+    
+    .notification-dropdown {
+        min-width: 320px;
+        padding: 0;
+        border: none;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .notification-item {
+        padding: 12px 16px;
+        border-left: 3px solid transparent;
+        transition: all 0.2s ease;
+    }
+    
+    .notification-item.unread {
+        border-left-color: var(--primary-color);
+        background-color: rgba(255, 64, 129, 0.05);
+    }
+    
+    .notification-item:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+    
+    .notification-icon-wrapper {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: rgba(255, 64, 129, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .notification-content p {
+        font-size: 0.9rem;
+    }
+    
+    .view-all {
+        font-weight: 500;
+        color: var(--primary-color);
+    }
+    
+    /* User dropdown styling */
+    .profile-avatar {
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+        background: linear-gradient(45deg, var(--primary-light), var(--primary-color));
+        color: white;
+    }
+    
+    .user-dropdown-btn:hover .profile-avatar {
+        border-color: var(--primary-color);
+        transform: scale(1.05);
+    }
+    
+    .user-dropdown {
+        min-width: 240px;
+        border: none;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .user-info {
+        padding: 8px 0;
+    }
+    
+    .dropdown-item {
+        padding: 10px 16px;
+        transition: all 0.2s ease;
+    }
+    
+    .dropdown-item:hover {
+        background-color: rgba(255, 64, 129, 0.05);
+    }
+    
+    .dropdown-item.text-danger:hover {
+        background-color: rgba(244, 67, 54, 0.05);
+    }
+</style>
+
+<script>
+    // Add scrolled class to navbar when scrolling
+    document.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 10) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    });
+</script>

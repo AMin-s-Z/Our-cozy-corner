@@ -1,0 +1,24 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}آفلاین - OUrLove{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <img src="{% static 'images/icons/icon-192x192.svg' %}" alt="OUrLove" width="96" height="96" class="mb-4">
+                    <h1 class="mb-4 text-primary">شما آفلاین هستید</h1>
+                    <p class="mb-4">به نظر می‌رسد اتصال اینترنت شما قطع شده است. لطفاً اتصال خود را بررسی کنید.</p>
+                    <p>برخی از بخش‌های برنامه همچنان در حالت آفلاین قابل استفاده هستند.</p>
+                    <div class="mt-4">
+                        <button onclick="window.location.reload()" class="btn btn-primary">تلاش مجدد</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

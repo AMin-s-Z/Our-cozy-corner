@@ -1,0 +1,89 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if is_edit %}ویرایش جایزه | OUrLove{% else %}افزودن جایزه به فروشگاه | OUrLove{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(118, 75, 162, 0.2);
+    }
+    .form-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        background: white;
+    }
+    .form-body {
+        padding: 30px;
+    }
+    .btn-form-submit {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 50px;
+        padding: 10px 30px;
+        color: white;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4 mb-5">
+    <div class="form-header">
+        <h2 class="h4 mb-0">
+            {% if is_edit %}
+                ویرایش جایزه
+            {% else %}
+                افزودن جایزه جدید به فروشگاه
+            {% endif %}
+        </h2>
+        <p class="mb-0">
+            {% if is_edit %}
+                تغییرات مورد نظر را در این جایزه اعمال کنید.
+            {% else %}
+                یک جایزه جدید با امتیاز مشخص برای فروشگاه ایجاد کنید.
+            {% endif %}
+        </p>
+    </div>
+    
+    <div class="form-card">
+        <div class="form-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                
+                <div class="d-flex justify-content-end align-items-center mt-4">
+                    <a href="{% url 'rewards:list' %}" class="btn btn-secondary me-3">انصراف</a>
+                    <button type="submit" class="btn btn-form-submit">
+                        {% if is_edit %}
+                            ذخیره تغییرات
+                        {% else %}
+                            افزودن به فروشگاه
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,709 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}داشبورد | OUrLove{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Welcome Banner -->
+    <div class="welcome-banner mb-4">
+        <div class="welcome-content">
+            <div class="d-flex align-items-center">
+                <div class="welcome-text">
+                    <h2 class="welcome-title">سلام {{ user.first_name }} 👋</h2>
+                    <p class="welcome-subtitle mb-0">به دنیای عاشقانه ما خوش آمدید</p>
+                </div>
+                <div class="ms-auto">
+                    <div class="points-badge">
+                        <i class="fas fa-coins me-1"></i> {{ user.points }} امتیاز
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-5">
+        <div class="col-6 col-md-2dot4 mb-3">
+            <a href="{% url 'memories:create' %}" class="quick-action-card">
+                <div class="quick-action-item memories-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <span class="quick-action-text">ثبت خاطره</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-2dot4 mb-3">
+            <a href="{% url 'goals:create' %}" class="quick-action-card">
+                <div class="quick-action-item goals-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-flag-checkered"></i>
+                    </div>
+                    <span class="quick-action-text">هدف جدید</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-2dot4 mb-3">
+            <a href="{% url 'moods:create' %}" class="quick-action-card">
+                <div class="quick-action-item moods-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-grin-stars"></i>
+                    </div>
+                    <span class="quick-action-text">ثبت حال</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-2dot4 mb-3">
+            <a href="{% url 'activities:list' %}" class="quick-action-card">
+                <div class="quick-action-item activities-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <span class="quick-action-text">انجام فعالیت</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-2dot4 mb-3">
+            <a href="{% url 'rewards:list' %}" class="quick-action-card">
+                <div class="quick-action-item rewards-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <span class="quick-action-text">فروشگاه جوایز</span>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Recent Memories -->
+    <div class="dashboard-section mb-5">
+        <div class="section-header">
+            <h5 class="section-title">
+                <i class="fas fa-book-open section-icon"></i>
+                آخرین خاطرات
+            </h5>
+            <a href="{% url 'memories:list' %}" class="section-link">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+        
+        <div class="row">
+            {% if recent_memories %}
+                {% for memory in recent_memories %}
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'memories:detail' memory.id %}" class="text-decoration-none">
+                            <div class="memory-card">
+                                <div class="memory-image-container">
+                                    {% if memory.image %}
+                                        <img src="{{ memory.image.url }}" class="memory-image" alt="{{ memory.title }}">
+                                    {% else %}
+                                        <div class="memory-placeholder">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="memory-content">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <h6 class="memory-title">{{ memory.title }}</h6>
+                                        <span class="memory-date">{{ memory.created_at|date:"Y/m/d" }}</span>
+                                    </div>
+                                    <p class="memory-text">{{ memory.content|truncatechars:80 }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <p>هنوز خاطره‌ای ثبت نشده است</p>
+                        <a href="{% url 'memories:create' %}" class="btn btn-primary btn-sm">ثبت اولین خاطره</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Active Goals -->
+    <div class="dashboard-section mb-5">
+        <div class="section-header">
+            <h5 class="section-title">
+                <i class="fas fa-bullseye section-icon"></i>
+                اهداف فعال
+            </h5>
+            <a href="{% url 'goals:list' %}" class="section-link">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+        
+        <div class="row">
+            {% if active_goals %}
+                {% for goal in active_goals %}
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'goals:detail' goal.id %}" class="text-decoration-none">
+                            <div class="goal-card">
+                                <div class="goal-content">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <h6 class="goal-title">{{ goal.title }}</h6>
+                                        <span class="goal-badge {% if goal.progress < 30 %}low-progress{% elif goal.progress < 70 %}mid-progress{% else %}high-progress{% endif %}">
+                                            {{ goal.progress }}%
+                                        </span>
+                                    </div>
+                                    <div class="goal-progress-container mb-3">
+                                        <div class="goal-progress-bar" style="width: {{ goal.progress }}%;"></div>
+                                    </div>
+                                    <p class="goal-text">{{ goal.description|truncatechars:80 }}</p>
+                                    <div class="goal-deadline">
+                                        <i class="far fa-calendar-alt"></i> مهلت: {{ goal.deadline|date:"Y/m/d" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <p>هنوز هدفی تعیین نشده است</p>
+                        <a href="{% url 'goals:create' %}" class="btn btn-primary btn-sm">تعیین اولین هدف</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Mood Chart and Rewards in Two Columns -->
+    <div class="row mb-5">
+        <!-- Daily Mood Chart -->
+        <div class="col-md-6 mb-4 mb-md-0">
+            <div class="dashboard-section h-100">
+                <div class="section-header">
+                    <h5 class="section-title">
+                        <i class="fas fa-heart section-icon"></i>
+                        نمودار حال و هوا
+                    </h5>
+                    <a href="{% url 'moods:list' %}" class="section-link">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                </div>
+                
+                <div class="mood-chart-container">
+                    {% if mood_data %}
+                        <canvas id="moodChart" data-labels="{{ mood_labels }}" data-values="{{ mood_values }}"></canvas>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <p>هنوز حال و هوایی ثبت نشده است</p>
+                            <a href="{% url 'moods:create' %}" class="btn btn-primary btn-sm">ثبت اولین حال و هوا</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rewards Section has been removed as it is now a shop -->
+        <div class="col-md-6">
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Dashboard Container */
+    .dashboard-container {
+        padding: 0 10px;
+    }
+    
+    /* Welcome Banner */
+    .welcome-banner {
+        background: linear-gradient(45deg, #FF4081, #FF80AB);
+        border-radius: 20px;
+        color: white;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(255, 64, 129, 0.2);
+        position: relative;
+    }
+    
+    .welcome-content {
+        padding: 25px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .welcome-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .welcome-subtitle {
+        opacity: 0.9;
+    }
+    
+    .reward-badge {
+        background-color: #FFD54F;
+        color: #5D4037;
+        border-radius: 30px;
+        padding: 8px 15px;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .reward-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        color: #5D4037;
+    }
+    
+    .points-badge {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 30px;
+        padding: 8px 15px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .pulse {
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.2);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    
+    /* Quick Actions */
+    .quick-action-card {
+        text-decoration: none;
+        display: block;
+        color: inherit;
+    }
+    
+    .quick-action-item {
+        background-color: white;
+        border-radius: 15px;
+        padding: 20px 10px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .quick-action-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .quick-action-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        font-size: 1.5rem;
+        color: white;
+    }
+    
+    .memories-action .quick-action-icon {
+        background: linear-gradient(45deg, #42A5F5, #2196F3);
+    }
+    
+    .goals-action .quick-action-icon {
+        background: linear-gradient(45deg, #66BB6A, #4CAF50);
+    }
+    
+    .moods-action .quick-action-icon {
+        background: linear-gradient(45deg, #EF5350, #F44336);
+    }
+
+    .activities-action .quick-action-icon {
+        background: linear-gradient(45deg, #7E57C2, #5E35B1);
+    }
+
+    .rewards-action .quick-action-icon {
+        background: linear-gradient(45deg, #FFCA28, #FFB300);
+    }
+    
+    .quick-action-text {
+        font-weight: 500;
+    }
+    
+    /* Dashboard Sections */
+    .dashboard-section {
+        background-color: white;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-icon {
+        margin-left: 8px;
+        color: #FF4081;
+    }
+    
+    .section-link {
+        color: #757575;
+        transition: color 0.2s;
+    }
+    
+    .section-link:hover {
+        color: #FF4081;
+    }
+    
+    /* Memory Cards */
+    .memory-card {
+        display: flex;
+        background-color: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+        color: inherit;
+    }
+    
+    .memory-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .memory-image-container {
+        width: 100px;
+        min-width: 100px;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    .memory-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .memory-placeholder {
+        width: 100%;
+        height: 100%;
+        background-color: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #bdbdbd;
+        font-size: 1.5rem;
+    }
+    
+    .memory-content {
+        padding: 15px;
+        flex: 1;
+    }
+    
+    .memory-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .memory-date {
+        font-size: 0.8rem;
+        color: #757575;
+        background-color: #f5f5f5;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-right: auto;
+    }
+    
+    .memory-text {
+        color: #757575;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    /* Goal Cards */
+    .goal-card {
+        background-color: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+        color: inherit;
+    }
+    
+    .goal-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .goal-content {
+        padding: 15px;
+    }
+    
+    .goal-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .goal-badge {
+        font-size: 0.8rem;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-right: auto;
+    }
+    
+    .low-progress {
+        background-color: #FF5252;
+    }
+    
+    .mid-progress {
+        background-color: #FFC107;
+    }
+    
+    .high-progress {
+        background-color: #4CAF50;
+    }
+    
+    .goal-progress-container {
+        background-color: #f5f5f5;
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .goal-progress-bar {
+        height: 100%;
+        background: linear-gradient(to right, #66BB6A, #4CAF50);
+        max-width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    
+    .goal-text {
+        color: #757575;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .goal-deadline {
+        font-size: 0.8rem;
+        color: #757575;
+    }
+    
+    /* Mood Chart */
+    .mood-chart-container {
+        height: 250px;
+        position: relative;
+    }
+    
+    /* Rewards */
+    .rewards-available {
+        background: linear-gradient(45deg, #FFECB3, #FFE082);
+        border-radius: 15px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .rewards-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #FFD54F;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 15px;
+        font-size: 1.5rem;
+        color: #5D4037;
+    }
+    
+    .rewards-text {
+        flex: 1;
+    }
+    
+    .rewards-text h6 {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #5D4037;
+    }
+    
+    .rewards-text p {
+        color: #5D4037;
+        opacity: 0.8;
+    }
+    
+    /* Empty States */
+    .empty-state {
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .empty-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 1.5rem;
+        color: #bdbdbd;
+    }
+    
+    /* Fix for col-md-2dot4 */
+    @media (min-width: 768px) {
+        .col-md-2dot4 {
+            flex: 0 0 20%;
+            max-width: 20%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup mood chart
+        const moodChartElement = document.getElementById('moodChart');
+        if (moodChartElement) {
+            const ctx = moodChartElement.getContext('2d');
+            const labels = JSON.parse(moodChartElement.getAttribute('data-labels'));
+            const values = JSON.parse(moodChartElement.getAttribute('data-values'));
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, 'rgba(239, 83, 80, 0.7)');
+            gradient.addColorStop(1, 'rgba(239, 83, 80, 0.1)');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'امتیاز حال و هوا',
+                        data: values,
+                        backgroundColor: gradient,
+                        borderColor: '#EF5350',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#EF5350',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 10,
+                            ticks: {
+                                stepSize: 2,
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            padding: 12,
+                            borderColor: '#ddd',
+                            borderWidth: 1,
+                            displayColors: false,
+                            callbacks: {
+                                title: function(context) {
+                                    return 'روز ' + context[0].label;
+                                },
+                                label: function(context) {
+                                    return 'امتیاز: ' + context.parsed.y + '/10';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

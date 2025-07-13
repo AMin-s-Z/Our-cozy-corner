@@ -1,0 +1,161 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}حذف حال و هوا | OUrLove{% endblock %}
+
+{% block extra_css %}
+<style>
+    .gradient-header {
+        background: linear-gradient(135deg, #FF4081, #7B1FA2);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(123, 31, 162, 0.2);
+    }
+    
+    .delete-card {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .delete-header {
+        border-bottom: 1px solid #f1f1f1;
+        padding-bottom: 1rem;
+    }
+    
+    .delete-warning {
+        background: linear-gradient(135deg, #ffefef, #ffe0e0);
+        border-right: 4px solid #ff4d4d;
+        border-radius: 10px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .delete-warning-icon {
+        color: #ff4d4d;
+        margin-left: 0.75rem;
+    }
+    
+    .mood-preview {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .mood-icon-container {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background-color: #f1f3f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2.5rem;
+    }
+    
+    .mood-badge {
+        font-size: 0.9rem;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .action-button {
+        border-radius: 50px;
+        padding: 0.6rem 1.5rem;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .action-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .action-button.btn-danger {
+        background: linear-gradient(135deg, #ff4d4d, #c62828);
+        border: none;
+        box-shadow: 0 4px 10px rgba(198, 40, 40, 0.3);
+    }
+    
+    .action-button.btn-danger:hover {
+        box-shadow: 0 6px 15px rgba(198, 40, 40, 0.4);
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: #FF4081;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .back-link:hover {
+        color: #7B1FA2;
+        transform: translateX(-3px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="mb-4">
+        <a href="{% url 'moods:detail' mood.id %}" class="back-link">
+            <i class="ti ti-arrow-left me-2"></i> بازگشت به جزئیات
+        </a>
+    </div>
+    
+    <div class="gradient-header mb-4">
+        <h2 class="h4 mb-0">حذف ثبت حال و هوا</h2>
+    </div>
+    
+    <div class="delete-card">
+        <div class="card-body p-4">
+            <div class="delete-warning d-flex align-items-center">
+                <i class="ti ti-alert-triangle fa-2x delete-warning-icon"></i>
+                <p class="mb-0">آیا مطمئن هستید که می‌خواهید این ثبت حال و هوا را حذف کنید؟ این عمل قابل بازگشت نیست.</p>
+            </div>
+            
+            <div class="mood-preview">
+                <div class="mood-icon-container">
+                    <i class="ti ti-{{ mood.get_mood_icon }}" style="color: {{ mood.get_mood_color }};"></i>
+                </div>
+                <h5 class="mb-2">{{ mood.get_mood_type_display }}</h5>
+                <div class="mb-2">
+                    <span class="mood-badge bg-{% if mood.rating >= 7 %}success{% elif mood.rating >= 4 %}warning{% else %}danger{% endif %} text-white">{{ mood.rating }}/10</span>
+                </div>
+                <div class="text-muted">
+                    <i class="ti ti-calendar me-1"></i> {{ mood.date|date:"Y/m/d" }}
+                </div>
+                
+                {% if mood.notes %}
+                <div class="mt-3 text-start">
+                    <small class="d-block text-muted">یادداشت:</small>
+                    <p class="small mb-0">{{ mood.notes|truncatechars:100 }}</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'moods:detail' mood.id %}" class="btn btn-outline-secondary action-button">
+                    <i class="ti ti-x me-1"></i> لغو
+                </a>
+                
+                <form method="post" class="mb-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger action-button">
+                        <i class="ti ti-trash me-1"></i> حذف نهایی
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

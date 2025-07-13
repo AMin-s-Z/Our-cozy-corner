@@ -1,0 +1,123 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}حذف جایزه | OUrLove{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-header {
+        background: linear-gradient(135deg, #FF5252, #F44336);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(244, 67, 54, 0.2);
+    }
+    
+    .delete-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .delete-body {
+        padding: 25px;
+    }
+    
+    .delete-alert {
+        background-color: rgba(255, 152, 0, 0.1);
+        border: none;
+        border-right: 4px solid #FF9800;
+        border-radius: 10px;
+        color: #5D4037;
+        padding: 15px;
+        font-size: 1rem;
+    }
+    
+    .delete-title {
+        font-weight: bold;
+        color: #FF9800;
+    }
+    
+    .delete-footer {
+        padding: 15px 25px;
+        background-color: #FAFAFA;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    .btn-delete {
+        background: linear-gradient(135deg, #FF5252, #F44336);
+        border: none;
+        border-radius: 50px;
+        padding: 10px 30px;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+    }
+    
+    .btn-cancel {
+        border: 1px solid #e0e0e0;
+        background: white;
+        border-radius: 50px;
+        padding: 10px 25px;
+        color: #757575;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-cancel:hover {
+        background-color: #f5f5f5;
+        color: #424242;
+    }
+    
+    /* Animation */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .delete-card {
+        animation: fadeInUp 0.3s ease-out forwards;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4 mb-5">
+    <div class="delete-header">
+        <h2 class="h4 mb-0">حذف جایزه</h2>
+    </div>
+    
+    <div class="delete-card">
+        <div class="delete-body">
+            <div class="delete-alert">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-exclamation-triangle text-warning me-3" style="font-size: 1.5rem;"></i>
+                    <h5 class="delete-title mb-0">آیا از حذف این جایزه اطمینان دارید؟</h5>
+                </div>
+                <p class="mb-2">شما در حال حذف جایزه <strong>"{{ reward.title }}"</strong> هستید.</p>
+                <p class="mb-0">این عملیات غیرقابل بازگشت است.</p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="delete-footer d-flex justify-content-between align-items-center mt-4">
+                    <a href="{% url 'rewards:list' %}" class="btn-cancel">
+                        انصراف
+                    </a>
+                    <button type="submit" class="btn-delete">
+                        <i class="fas fa-trash-alt me-2"></i> حذف جایزه
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

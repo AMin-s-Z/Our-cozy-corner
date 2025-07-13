@@ -1,0 +1,176 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}فروشگاه جوایز | OUrLove{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rewards-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(118, 75, 162, 0.2);
+    }
+    .points-display {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    .points-display .fa-coins {
+        color: #FFD700;
+        margin-right: 8px;
+    }
+    .section-title {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    .reward-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+        background: white;
+    }
+    .reward-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+    }
+    .reward-card.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+    .reward-body {
+        padding: 20px;
+    }
+    .reward-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+    }
+    .reward-description {
+        color: #666;
+        font-size: 0.95rem;
+        min-height: 45px;
+    }
+    .reward-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #f8f9fa;
+    }
+    .reward-cost {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #764ba2;
+    }
+    .redeem-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 8px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .redeem-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(118, 75, 162, 0.3);
+    }
+    .redeem-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+    .redeemed-card {
+        background-color: #f1f1f1;
+    }
+    .redeemed-card .reward-title {
+        text-decoration: line-through;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4 mb-5">
+    <div class="rewards-header d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="h4 mb-0">فروشگاه جوایز</h2>
+            <p class="mb-0">از امتیازهای خود برای دریافت جوایز استفاده کنید!</p>
+        </div>
+        <div class="points-display">
+            <i class="fas fa-coins"></i>
+            <span>شما: {{ user_points }} امتیاز</span>
+            {% if partner %}
+            <br>
+            <i class="fas fa-coins"></i>
+            <span>{{ partner.username }}: {{ partner_points }} امتیاز</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Available Rewards -->
+    <h3 class="section-title">جوایز موجود</h3>
+    <div class="row">
+        {% for reward in available_rewards %}
+        <div class="col-md-6 col-lg-4">
+            <div class="reward-card {% if user_points < reward.cost %}disabled{% endif %}">
+                <div class="reward-body">
+                    <h5 class="reward-title">{{ reward.title }}</h5>
+                    <p class="reward-description">{{ reward.description|truncatechars:100 }}</p>
+                </div>
+                <div class="reward-footer">
+                    <div class="reward-cost">
+                        <i class="fas fa-coins"></i>
+                        {{ reward.cost }}
+                    </div>
+                    <form method="post" action="{% url 'rewards:redeem' reward.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn redeem-btn" {% if user_points < reward.cost %}disabled{% endif %}>
+                            دریافت
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <p>در حال حاضر جایزه‌ای در فروشگاه موجود نیست.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <hr class="my-5">
+
+    <!-- Redemption History -->
+    <h3 class="section-title">تاریخچه دریافت جوایز</h3>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>جایزه</th>
+                    <th>دریافت کننده</th>
+                    <th>تاریخ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for redeemed_reward in all_redeemed_rewards %}
+                <tr>
+                    <td>{{ redeemed_reward.reward.title }}</td>
+                    <td>{{ redeemed_reward.user.username }}</td>
+                    <td>{{ redeemed_reward.redeemed_at|date:"Y/m/d H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center">هنوز جایزه‌ای ��ریافت نشده است.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

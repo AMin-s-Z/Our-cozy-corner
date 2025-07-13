@@ -1,0 +1,168 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}جزئیات حال و هوا | OUrLove{% endblock %}
+
+{% block extra_css %}
+<style>
+    .gradient-header {
+        background: linear-gradient(135deg, #FF4081, #7B1FA2);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(123, 31, 162, 0.2);
+    }
+    
+    .mood-card {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .mood-icon-container {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: #f1f3f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 3.5rem;
+    }
+    
+    .mood-rating {
+        margin-bottom: 1.5rem;
+    }
+    
+    .mood-badge {
+        font-size: 1.25rem;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .mood-meta {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+    
+    .mood-meta-item {
+        display: flex;
+        align-items: center;
+        margin: 0 0.75rem;
+    }
+    
+    .mood-meta-icon {
+        margin-right: 0.5rem;
+        color: #FF4081;
+    }
+    
+    .mood-notes {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .mood-notes::before {
+        content: '"';
+        position: absolute;
+        top: 0.5rem;
+        right: 1rem;
+        font-size: 3rem;
+        color: rgba(0,0,0,0.1);
+        font-family: serif;
+    }
+    
+    .action-button {
+        border-radius: 50px;
+        padding: 0.6rem 1.5rem;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .action-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: #FF4081;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .back-link:hover {
+        color: #7B1FA2;
+        transform: translateX(-3px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="mb-4">
+        <a href="{% url 'moods:list' %}" class="back-link">
+            <i class="ti ti-arrow-left me-2"></i> بازگشت به حال و هوا
+        </a>
+    </div>
+    
+    <div class="gradient-header mb-4">
+        <h2 class="h4 mb-0">جزئیات حال و هوا</h2>
+    </div>
+    
+    <div class="mood-card">
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <div class="mood-icon-container">
+                    {{ mood.get_mood_emoji }}
+                </div>
+                <h2 class="h3 mb-3">{{ mood.get_mood_type_display }}</h2>
+                <div class="mood-rating">
+                    <span class="mood-badge bg-{% if mood.rating >= 7 %}success{% elif mood.rating >= 4 %}warning{% else %}danger{% endif %} text-white">{{ mood.rating }}/10</span>
+                </div>
+                <div class="mood-meta">
+                    <div class="mood-meta-item">
+                        <i class="ti ti-calendar mood-meta-icon"></i>
+                        <span>{{ mood.date|date:"Y/m/d" }}</span>
+                    </div>
+                    <div class="mood-meta-item">
+                        <i class="ti ti-user mood-meta-icon"></i>
+                        <span>{{ mood.user.get_full_name|default:mood.user.username }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if mood.notes %}
+                <div class="mb-4">
+                    <h5 class="mb-3">یادداشت‌ها:</h5>
+                    <div class="mood-notes">
+                        {{ mood.notes|linebreaks }}
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if mood.user == request.user %}
+                <div class="d-flex justify-content-center mt-4">
+                    <a href="{% url 'moods:update' mood.id %}" class="btn btn-outline-primary action-button me-3">
+                        <i class="ti ti-pencil me-1"></i> ویرایش
+                    </a>
+                    <a href="{% url 'moods:delete' mood.id %}" class="btn btn-outline-danger action-button">
+                        <i class="ti ti-trash me-1"></i> حذف
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

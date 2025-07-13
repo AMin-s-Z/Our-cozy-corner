@@ -1,0 +1,120 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}خاطرات ما | LoveOur{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header Section -->
+    <div class="card mb-4 border-0 bg-gradient-primary text-white">
+        <div class="card-body py-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">خاطرات ما</h1>
+                    <p class="mb-0 opacity-75">لحظات زیبای زندگی مشترک</p>
+                </div>
+                <a href="{% url 'memories:create' %}" class="btn btn-light text-primary rounded-pill shadow-sm">
+                    <i class="fas fa-plus me-2"></i> خاطره جدید
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Search Box -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body">
+            <form action="{% url 'memories:search' %}" method="get" class="d-flex">
+                <input type="search" name="q" class="form-control rounded-pill border-0 bg-light" placeholder="جستجو در خاطرات..." aria-label="جستجو">
+                <button class="btn btn-primary ms-2 rounded-circle" type="submit" style="width: 40px; height: 40px; padding: 0;">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Memories List -->
+    {% if memories %}
+        <div class="row">
+            {% for memory in memories %}
+                <div class="col-md-6 mb-4">
+                    <div class="card memory-card h-100 border-0 shadow-sm hover-lift">
+                        {% if memory.image %}
+                            <div class="position-relative">
+                                <img src="{{ memory.image.url }}" class="card-img-top memory-image" alt="{{ memory.title }}">
+                                <div class="memory-mood">
+                                    <i class="far {{ memory.get_mood_icon }} {{ memory.get_mood_color }} me-1"></i>
+                                    {{ memory.get_mood_display }}
+                                </div>
+                                <div class="position-absolute bottom-0 start-0 end-0 p-3 text-white" style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);">
+                                    <h5 class="card-title mb-0">{{ memory.title }}</h5>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            {% if not memory.image %}
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title">{{ memory.title }}</h5>
+                                    <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                                        <i class="far {{ memory.get_mood_icon }} {{ memory.get_mood_color }} me-1"></i>
+                                        {{ memory.get_mood_display }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            <p class="card-text text-secondary">{{ memory.content|truncatechars:150 }}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="text-muted small">
+                                    <i class="far fa-calendar-alt me-1"></i> {{ memory.date|date:"Y/m/d" }}
+                                    {% if memory.location %}
+                                        <span class="ms-2"><i class="fas fa-map-marker-alt me-1"></i> {{ memory.location }}</span>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'memories:detail' memory.id %}" class="btn btn-sm btn-outline-primary rounded-pill">مشاهده خاطره</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+                <div class="mb-4">
+                    <i class="fas fa-photo-video fa-4x text-primary opacity-50"></i>
+                </div>
+                <h5 class="mb-3">هنوز خاطره‌ای ثبت نشده است</h5>
+                <p class="text-muted mb-4">اولین خاطره زیبای خود را با همسرتان ثبت کنید</p>
+                <a href="{% url 'memories:create' %}" class="btn btn-primary rounded-pill px-4">
+                    <i class="fas fa-plus me-2"></i> ثبت اولین خاطره
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #FF9E80 100%);
+    }
+    
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .memory-mood {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background-color: rgba(255,255,255,0.9);
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %} 

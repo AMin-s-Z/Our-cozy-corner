@@ -1,0 +1,258 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} | OUrLove{% endblock %}
+
+{% block extra_css %}
+<style>
+    .gradient-header {
+        background: linear-gradient(135deg, #FF4081, #7B1FA2);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(123, 31, 162, 0.2);
+    }
+    
+    .form-card {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #FF4081;
+        box-shadow: 0 0 0 0.25rem rgba(255, 64, 129, 0.25);
+    }
+    
+    .mood-submit-btn {
+        background: linear-gradient(135deg, #FF4081, #7B1FA2);
+        border: none;
+        border-radius: 50px;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        color: white;
+        box-shadow: 0 4px 15px rgba(255, 64, 129, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .mood-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 64, 129, 0.4);
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: #FF4081;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .back-link:hover {
+        color: #7B1FA2;
+        transform: translateX(-3px);
+    }
+    
+    /* Custom Mood Selector with Emojis */
+    .mood-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 15px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .mood-option {
+        position: relative;
+    }
+    
+    .mood-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .mood-option label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 15px;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        font-size: 2.5rem; /* Emoji size */
+    }
+    
+    .mood-option input[type="radio"]:checked + label {
+        transform: scale(1.1) translateY(-5px);
+        background-color: #fff;
+        box-shadow: 0 8px 25px rgba(255, 64, 129, 0.3);
+        border: 2px solid #FF4081;
+    }
+    
+    .mood-option label:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    .rating-container, .notes-container {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    #ratingValue {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #FF4081;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="mb-4">
+        <a href="{% url 'moods:list' %}" class="back-link">
+            <i class="ti ti-arrow-left me-2"></i> بازگشت به حال و هوا
+        </a>
+    </div>
+    
+    <div class="gradient-header mb-4">
+        <h2 class="h4 mb-0">{{ title }}</h2>
+    </div>
+    
+    <div class="form-card">
+        <div class="card-body p-4">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div class="mb-4">
+                    <label class="form-label mb-3">{{ form.mood_type.label }}</label>
+                    <div class="mood-selector">
+                        {% for radio in form.mood_type %}
+                            <div class="mood-option">
+                                {{ radio.tag }}
+                                <label for="{{ radio.id_for_label }}" title="{{ radio.choice_label }}"></label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if form.mood_type.errors %}
+                        <div class="text-danger mt-1 small">
+                            {% for error in form.mood_type.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-4">
+                    <label for="{{ form.rating.id_for_label }}" class="form-label">{{ form.rating.label }}</label>
+                    <div class="rating-container">
+                        {{ form.rating }}
+                        <div id="ratingValue" class="text-center mt-2"></div>
+                    </div>
+                    {% if form.rating.errors %}
+                         <div class="text-danger mt-1 small">
+                            {% for error in form.rating.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">{{ form.notes.label }}</label>
+                    <div class="notes-container">
+                        {{ form.notes }}
+                    </div>
+                     {% if form.notes.errors %}
+                         <div class="text-danger mt-1 small">
+                            {% for error in form.notes.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn mood-submit-btn">
+                        <i class="ti ti-device-floppy me-2"></i> ذخیره
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Rating slider functionality
+    const ratingInput = document.getElementById('{{ form.rating.id_for_label }}');
+    const ratingValue = document.getElementById('ratingValue');
+    
+    function updateRatingValue() {
+        if (!ratingInput || !ratingValue) return;
+        const val = ratingInput.value;
+        ratingValue.textContent = `${val}/10`;
+    }
+    
+    if (ratingInput) {
+        updateRatingValue();
+        ratingInput.addEventListener('input', updateRatingValue);
+    }
+
+    // Map mood values to emojis and populate labels
+    const moodEmojis = {
+        'very_happy': '😁', 'happy': '😊', 'excited': '🤩', 'content': '🙂',
+        'relaxed': '😌', 'neutral': '😐', 'confused': '😕', 'anxious': '😟',
+        'sad': '😢', 'frustrated': '😤', 'angry': '😡', 'sleepy': '😴', 'very_sad': '😭'
+    };
+    
+    const moodOptions = document.querySelectorAll('.mood-option');
+    moodOptions.forEach(option => {
+        const input = option.querySelector('input[type="radio"]');
+        if (input) {
+            const emoji = moodEmojis[input.value];
+            const label = option.querySelector('label');
+            if (label && emoji) {
+                label.textContent = emoji;
+            }
+        }
+    });
+
+    // Animate options on load
+    moodOptions.forEach((option, index) => {
+        option.style.opacity = '0';
+        option.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            option.style.transition = 'all 0.3s ease';
+            option.style.opacity = '1';
+            option.style.transform = 'translateY(0)';
+        }, 100 + (index * 40));
+    });
+});
+</script>
+{% endblock %} 

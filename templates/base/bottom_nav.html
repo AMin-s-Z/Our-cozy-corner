@@ -1,0 +1,198 @@
+<!-- Bottom navigation for mobile -->
+<div class="bottom-nav">
+    <div class="container">
+        <div class="row g-0">
+            <div class="col text-center">
+                <a href="{% url 'dashboard' %}" class="bottom-nav-item {% if request.path == '/dashboard/' %}active{% endif %}">
+                    <div class="icon-container">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">خانه</div>
+                </a>
+            </div>
+            <div class="col text-center">
+                <a href="{% url 'memories:list' %}" class="bottom-nav-item {% if '/memories/' in request.path %}active{% endif %}">
+                    <div class="icon-container">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="nav-text">خاطرات</div>
+                </a>
+            </div>
+            <div class="col text-center">
+                <a href="{% url 'goals:list' %}" class="bottom-nav-item {% if '/goals/' in request.path %}active{% endif %}">
+                    <div class="icon-container">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="nav-text">اهداف</div>
+                </a>
+            </div>
+            <div class="col text-center">
+                <a href="{% url 'moods:list' %}" class="bottom-nav-item {% if '/moods/' in request.path %}active{% endif %}">
+                    <div class="icon-container">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="nav-text">حال</div>
+                </a>
+            </div>
+            <div class="col text-center">
+                <a href="{% url 'activities:list' %}" class="bottom-nav-item {% if '/activities/' in request.path %}active{% endif %}">
+                    <div class="icon-container">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="nav-text">فعالیت‌ها</div>
+                </a>
+            </div>
+            <div class="col text-center">
+                <a href="{% url 'rewards:list' %}" class="bottom-nav-item {% if '/rewards/' in request.path %}active{% endif %}">
+                    <div class="icon-container">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="nav-text">جوایز</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Enhanced bottom navigation */
+    .bottom-nav {
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.08);
+        padding: 12px 0 10px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .bottom-nav::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 4px;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+    }
+    
+    .bottom-nav-item {
+        position: relative;
+        padding: 8px 0;
+        transition: transform 0.3s ease, color 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .bottom-nav-item::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 3px;
+        background: var(--primary-gradient);
+        transition: width 0.3s ease, left 0.3s ease;
+        border-radius: 3px;
+    }
+    
+    .bottom-nav-item:hover::after,
+    .bottom-nav-item.active::after {
+        width: 60%;
+        left: 20%;
+    }
+    
+    .bottom-nav-item.active {
+        color: var(--primary-color);
+        transform: translateY(-8px);
+    }
+    
+    .bottom-nav-item .icon-container {
+        font-size: 22px;
+        margin-bottom: 6px;
+        transition: transform 0.3s ease;
+        position: relative;
+    }
+    
+    .bottom-nav-item:hover .icon-container {
+        transform: translateY(-2px);
+    }
+    
+    .bottom-nav-item.active .icon-container {
+        transform: translateY(-2px) scale(1.1);
+    }
+    
+    .bottom-nav-item .nav-text {
+        font-size: 12px;
+        font-weight: 500;
+        transition: opacity 0.3s ease;
+        opacity: 0.8;
+    }
+    
+    .bottom-nav-item.active .nav-text {
+        opacity: 1;
+    }
+    
+    /* Active indicator animation */
+    @keyframes pulse-border {
+        0% { box-shadow: 0 0 0 0 rgba(255, 64, 129, 0.4); }
+        70% { box-shadow: 0 0 0 6px rgba(255, 64, 129, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 64, 129, 0); }
+    }
+    
+    .bottom-nav-item.active .icon-container::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgba(255, 64, 129, 0.1);
+        transform: translate(-50%, -50%);
+        z-index: -1;
+        animation: pulse-border 2s infinite;
+    }
+    
+    /* Hide bottom nav when keyboard is visible (mobile) */
+    @media (max-height: 400px) {
+        .bottom-nav {
+            transform: translateY(100%);
+        }
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+        body.auto-dark-mode .bottom-nav {
+            background: rgba(30, 30, 30, 0.95);
+        }
+        
+        body.auto-dark-mode .bottom-nav::before {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+    }
+</style>
+
+<script>
+    // Hide bottom nav when scrolling down, show when scrolling up
+    document.addEventListener('DOMContentLoaded', function() {
+        let lastScrollTop = 0;
+        const bottomNav = document.querySelector('.bottom-nav');
+        const scrollThreshold = 50;
+        
+        window.addEventListener('scroll', function() {
+            let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (currentScroll > lastScrollTop + scrollThreshold) {
+                // Scrolling down
+                bottomNav.classList.add('bottom-nav-hidden');
+                lastScrollTop = currentScroll;
+            } else if (currentScroll < lastScrollTop - scrollThreshold/2) {
+                // Scrolling up
+                bottomNav.classList.remove('bottom-nav-hidden');
+                lastScrollTop = currentScroll;
+            }
+        });
+    });
+</script> 

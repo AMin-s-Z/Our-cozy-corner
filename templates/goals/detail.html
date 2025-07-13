@@ -1,0 +1,316 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{{ goal.title }} | LoveOur{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="mb-4">
+        <a href="{% url 'goals:list' %}" class="btn btn-light rounded-pill shadow-sm">
+            <i class="fas fa-arrow-right me-2"></i> بازگشت به اهداف
+        </a>
+    </div>
+    
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="category-icon-circle me-3 {{ goal.get_category_color }}">
+                        <i class="fas {{ goal.get_category_icon }}"></i>
+                    </div>
+                    <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ goal.get_category_display }}</span>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                    <span class="badge {{ goal.priority|yesno:'bg-danger,bg-primary,bg-secondary' }} rounded-pill px-3 py-2">
+                        <i class="fas fa-flag me-1"></i> {{ goal.get_priority_display }}
+                    </span>
+                    
+                    {% if goal.deadline %}
+                        <div class="deadline-badge ms-2">
+                            <i class="far fa-calendar-alt me-1"></i> {{ goal.deadline|date:"Y/m/d" }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <h1 class="h3 mb-4">{{ goal.title }}</h1>
+            
+            <div class="goal-progress-container mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5>پیشرفت</h5>
+                    <div class="progress-percentage">
+                        <span class="progress-text fw-bold {{ goal.get_progress_color|replace:'bg-,text-' }}">{{ goal.progress }}%</span>
+                    </div>
+                </div>
+                <div class="goal-progress rounded-pill">
+                    <div class="goal-progress-bar rounded-pill {{ goal.get_progress_color }}" style="width: {{ goal.progress }}%"></div>
+                </div>
+            </div>
+            
+            {% if goal.description %}
+                <div class="mb-4">
+                    <h5 class="mb-3">توضیحات</h5>
+                    <div class="p-4 bg-light rounded-3 border-start border-4 border-secondary description-box">
+                        {{ goal.description|linebreaks }}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="goal-meta p-3 bg-light rounded-3 mb-4">
+                <div class="row">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle bg-white shadow-sm me-3">
+                                <i class="far fa-user text-secondary"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">ایجاد شده توسط</small>
+                                <strong>{{ goal.created_by.get_full_name|default:goal.created_by.username }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle bg-white shadow-sm me-3">
+                                <i class="far fa-calendar-plus text-secondary"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">تاریخ ایجاد</small>
+                                <strong>{{ goal.created_at|date:"Y/m/d" }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end mt-4">
+                {% if goal.created_by == request.user %}
+                    <a href="{% url 'goals:edit' goal.id %}" class="btn btn-outline-primary rounded-pill me-2">
+                        <i class="fas fa-edit me-1"></i> ویرایش
+                    </a>
+                    <a href="{% url 'goals:delete' goal.id %}" class="btn btn-outline-danger rounded-pill me-2">
+                        <i class="fas fa-trash-alt me-1"></i> حذف
+                    </a>
+                {% endif %}
+                
+                <form action="{% url 'goals:toggle_complete' goal.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn rounded-pill {% if goal.completed %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                        {% if goal.completed %}
+                            <i class="fas fa-undo me-1"></i> بازگشت به فعال
+                        {% else %}
+                            <i class="fas fa-check me-1"></i> تکمیل شد
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    {% if goal.created_by == request.user %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="mb-0">بروزرسانی پیشرفت</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label for="progressRange" class="form-label mb-0">مقدار پیشرفت فعلی</label>
+                        <span id="progressValue" class="badge bg-primary rounded-pill px-3 py-2">{{ goal.progress }}%</span>
+                    </div>
+                    <input type="range" class="form-range" min="0" max="100" step="5" id="progressRange" value="{{ goal.progress }}">
+                </div>
+                <button id="updateProgressBtn" class="btn btn-primary rounded-pill px-4">
+                    <i class="fas fa-sync-alt me-2"></i> بروزرسانی پیشرفت
+                </button>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .goal-progress {
+        height: 10px;
+        background-color: #f0f0f0;
+        border-radius: 30px;
+        overflow: hidden;
+    }
+    
+    .goal-progress-bar {
+        height: 100%;
+        transition: width 0.5s ease;
+    }
+    
+    .category-icon-circle {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(0,0,0,0.05);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        z-index: 5;
+    }
+    
+    .deadline-badge {
+        background-color: rgba(0,0,0,0.05);
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+    
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+    }
+    
+    .description-box {
+        font-size: 1.05rem;
+        line-height: 1.8;
+    }
+    
+    .form-range::-webkit-slider-thumb {
+        background: var(--secondary-color);
+    }
+    
+    .form-range::-moz-range-thumb {
+        background: var(--secondary-color);
+    }
+    
+    .goal-meta {
+        border-right: 4px solid var(--secondary-color);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+{% if goal.created_by == request.user %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressRange = document.getElementById('progressRange');
+        const progressValue = document.getElementById('progressValue');
+        const updateProgressBtn = document.getElementById('updateProgressBtn');
+        
+        progressRange.addEventListener('input', function() {
+            progressValue.textContent = this.value + '%';
+            
+            // Change badge color based on progress value
+            progressValue.className = 'badge rounded-pill px-3 py-2';
+            if (this.value >= 75) {
+                progressValue.classList.add('bg-success');
+            } else if (this.value >= 50) {
+                progressValue.classList.add('bg-info');
+            } else if (this.value >= 25) {
+                progressValue.classList.add('bg-warning');
+            } else {
+                progressValue.classList.add('bg-danger');
+            }
+        });
+        
+        updateProgressBtn.addEventListener('click', function() {
+            const progress = progressRange.value;
+            
+            // Show loading state
+            updateProgressBtn.disabled = true;
+            updateProgressBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> در حال بروزرسانی...';
+            
+            // Send AJAX request to update progress
+            fetch('{% url "goals:update_progress" goal.id %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: `progress=${progress}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update UI
+                    document.querySelector('.goal-progress-bar').style.width = `${data.progress}%`;
+                    document.querySelector('.progress-text').textContent = `${data.progress}%`;
+                    
+                    // Show success notification
+                    const successAlert = document.createElement('div');
+                    successAlert.className = 'alert alert-success alert-dismissible fade show position-fixed bottom-0 end-0 m-3';
+                    successAlert.innerHTML = `
+                        <i class="fas fa-check-circle me-2"></i> پیشرفت با موفقیت بروز شد
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    document.body.appendChild(successAlert);
+                    
+                    // Remove alert after 3 seconds
+                    setTimeout(() => {
+                        successAlert.remove();
+                    }, 3000);
+                    
+                    // Reset button state
+                    updateProgressBtn.disabled = false;
+                    updateProgressBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i> بروزرسانی پیشرفت';
+                    
+                    // If goal is now complete, reload the page
+                    if (data.completed) {
+                        window.location.reload();
+                    }
+                } else {
+                    // Show error notification
+                    const errorAlert = document.createElement('div');
+                    errorAlert.className = 'alert alert-danger alert-dismissible fade show position-fixed bottom-0 end-0 m-3';
+                    errorAlert.innerHTML = `
+                        <i class="fas fa-exclamation-circle me-2"></i> خطا: ${data.error}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    document.body.appendChild(errorAlert);
+                    
+                    // Reset button state
+                    updateProgressBtn.disabled = false;
+                    updateProgressBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i> بروزرسانی پیشرفت';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+                // Show error notification
+                const errorAlert = document.createElement('div');
+                errorAlert.className = 'alert alert-danger alert-dismissible fade show position-fixed bottom-0 end-0 m-3';
+                errorAlert.innerHTML = `
+                    <i class="fas fa-exclamation-circle me-2"></i> خطا در بروزرسانی پیشرفت
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                document.body.appendChild(errorAlert);
+                
+                // Reset button state
+                updateProgressBtn.disabled = false;
+                updateProgressBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i> بروزرسانی پیشرفت';
+            });
+        });
+        
+        // Get CSRF token from cookies
+        function getCsrfToken() {
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endif %}
+{% endblock %} 

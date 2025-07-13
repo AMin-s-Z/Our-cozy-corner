@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}OUrLove - برنامه عاشقانه ما{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center mt-5">
+            <h1 class="mb-4">
+                <span class="text-primary">OUr</span><span class="text-danger">Love</span>
+            </h1>
+            <p class="lead mb-5">برنامه عاشقانه برای ثبت خاطرات و لحظات مشترک دو نفره</p>
+            
+            <div class="card shadow mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-3">ورود به برنامه</h2>
+                    
+                    <div class="d-grid gap-3">
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg">ورود</a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-secondary">ثبت نام</a>
+                    </div>
+                    
+                    <button id="installApp" class="btn btn-success mt-4" style="display: none;">
+                        <i class="fas fa-download me-2"></i> نصب برنامه
+                    </button>
+                </div>
+            </div>
+            
+            <div class="row mt-5">
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <i class="fas fa-book-open fa-2x text-primary mb-3"></i>
+                        <h3 class="h5">خاطرات مشترک</h3>
+                        <p>ثبت لحظات خاص با متن، عکس و حالت احساسی</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <i class="fas fa-bullseye fa-2x text-primary mb-3"></i>
+                        <h3 class="h5">اهداف مشترک</h3>
+                        <p>تعیین و پیگیری اهداف دو نفره با قابلیت رصد پیشرفت</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <i class="fas fa-heart fa-2x text-danger mb-3"></i>
+                        <h3 class="h5">حال و هوای روزانه</h3>
+                        <p>ثبت و تحلیل حالات احساسی با نمودار و آمار</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

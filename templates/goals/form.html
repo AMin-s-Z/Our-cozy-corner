@@ -1,0 +1,617 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} | LoveOur{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+<style>
+    /* Custom styles for Persian Date Picker */
+    .datepicker-plot-area {
+        font-family: 'Vazir', 'Tahoma', sans-serif !important;
+        border-radius: 12px !important;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15) !important;
+        z-index: 9999 !important;
+    }
+    
+    .datepicker-plot-area .datepicker-header {
+        background: linear-gradient(135deg, #3498db, #2c3e50) !important;
+    }
+    
+    .datepicker-plot-area .datepicker-header .btn-today {
+        color: #fff !important;
+    }
+    
+    .datepicker-plot-area .datepicker-day-view .table-days td.selected span {
+        background-color: #3498db !important;
+    }
+    
+    .datepicker-plot-area .datepicker-day-view .table-days td span:hover {
+        background-color: rgba(52, 152, 219, 0.15) !important;
+    }
+    
+    .datepicker-plot-area .datepicker-navigator .pwt-btn-next,
+    .datepicker-plot-area .datepicker-navigator .pwt-btn-prev,
+    .datepicker-plot-area .datepicker-navigator .pwt-btn-switch {
+        color: #fff !important;
+    }
+    
+    /* Fix for date input */
+    input.persian-date {
+        cursor: pointer;
+        background-color: #fff;
+    }
+    
+    /* Ensure date picker is visible */
+    .datepicker-container {
+        z-index: 10000 !important;
+        position: fixed !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="mb-4">
+        <a href="{% url 'goals:list' %}" class="btn btn-light rounded-pill shadow-sm">
+            <i class="fas fa-arrow-right me-2"></i> بازگشت به اهداف
+        </a>
+    </div>
+    
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3 border-0">
+            <h2 class="h4 mb-0">{{ title }}</h2>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger rounded-3">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div class="mb-4">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">عنوان هدف</label>
+                    <div class="position-relative">
+                        <i class="fas fa-bullseye form-floating-icon"></i>
+                        {{ form.title }}
+                    </div>
+                    {% if form.title.errors %}
+                        <div class="text-danger mt-1 small">
+                            {% for error in form.title.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label for="{{ form.category.id_for_label }}" class="form-label">دسته‌بندی</label>
+                        <div class="position-relative">
+                            <i class="fas fa-layer-group form-floating-icon"></i>
+                            {{ form.category }}
+                        </div>
+                        <div class="category-icons">
+                            <span class="category-icon-item" data-value="relationship" title="رابطه"><i class="fas fa-heart text-danger"></i></span>
+                            <span class="category-icon-item" data-value="financial" title="مالی"><i class="fas fa-money-bill-wave text-success"></i></span>
+                            <span class="category-icon-item" data-value="health" title="سلامتی"><i class="fas fa-heartbeat text-info"></i></span>
+                            <span class="category-icon-item" data-value="travel" title="سفر"><i class="fas fa-plane text-primary"></i></span>
+                            <span class="category-icon-item" data-value="home" title="خانه"><i class="fas fa-home text-secondary"></i></span>
+                            <span class="category-icon-item" data-value="personal" title="شخصی"><i class="fas fa-user text-warning"></i></span>
+                            <span class="category-icon-item" data-value="other" title="سایر"><i class="fas fa-star text-dark"></i></span>
+                        </div>
+                        <div class="text-center mt-2 small text-muted">برای انتخاب دسته‌بندی روی آیکون‌ها کلیک کنید</div>
+                        {% if form.category.errors %}
+                            <div class="text-danger mt-1 small">
+                                {% for error in form.category.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.priority.id_for_label }}" class="form-label">اولویت</label>
+                        <div class="position-relative">
+                            <i class="fas fa-flag form-floating-icon"></i>
+                            {{ form.priority }}
+                        </div>
+                        <div class="priority-indicators">
+                            <span class="priority-indicator" data-value="1"><i class="fas fa-flag text-muted"></i> کم</span>
+                            <span class="priority-indicator" data-value="2"><i class="fas fa-flag text-primary"></i> متوسط</span>
+                            <span class="priority-indicator" data-value="3"><i class="fas fa-flag text-danger"></i> زیاد</span>
+                        </div>
+                        <div class="text-center mt-2 small text-muted">برای انتخاب اولویت روی گزینه‌ها کلیک کنید</div>
+                        {% if form.priority.errors %}
+                            <div class="text-danger mt-1 small">
+                                {% for error in form.priority.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">توضیحات</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger mt-1 small">
+                            {% for error in form.description.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label for="date_picker_input" class="form-label">مهلت انجام</label>
+                        <div class="position-relative">
+                            <i class="fas fa-calendar-alt form-floating-icon"></i>
+                            <input type="text" id="date_picker_input" class="form-control form-control-icon" placeholder="Select date (YYYY/MM/DD)" autocomplete="off" readonly>
+                            {{ form.deadline }}
+                            <div class="small text-muted mt-1">برای انتخاب تاریخ میلادی کلیک کنید</div>
+                        </div>
+                        {% if form.deadline.errors %}
+                            <div class="text-danger mt-1 small">
+                                {% for error in form.deadline.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.progress.id_for_label }}" class="form-label">پیشرفت <span id="progressValue" class="badge bg-primary rounded-pill ms-2">{{ form.progress.value|default:'0' }}%</span></label>
+                        {{ form.progress }}
+                        {% if form.progress.errors %}
+                            <div class="text-danger mt-1 small">
+                                {% for error in form.progress.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">{{ form.progress.help_text }}</div>
+                        
+                        <!-- Progress Bar Visualization -->
+                        <div class="progress mt-2" style="height: 10px; border-radius: 5px;">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ form.progress.value|default:'0' }}%;" aria-valuenow="{{ form.progress.value|default:'0' }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <a href="{% url 'goals:list' %}" class="btn btn-outline-secondary rounded-pill px-4">انصراف</a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-5">
+                        <i class="fas fa-save me-2"></i> ذخیره هدف
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        border: 1px solid #e0e0e0;
+        padding: 12px 15px;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #555;
+    }
+    
+    .form-floating-icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 15px;
+        color: var(--secondary-color);
+        opacity: 0.7;
+        z-index: 5;
+        width: 20px;
+        text-align: center;
+        font-size: 16px;
+    }
+    
+    .form-control-icon {
+        padding-right: 45px !important;
+    }
+    
+    .form-range::-webkit-slider-thumb {
+        background: var(--secondary-color);
+    }
+    
+    .form-range::-moz-range-thumb {
+        background: var(--secondary-color);
+    }
+    
+    /* Persian Date Picker Styling */
+    .jdp-container {
+        direction: rtl;
+        font-family: 'Vazir', 'Tahoma', sans-serif !important;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15) !important;
+        border-radius: 12px !important;
+        overflow: hidden;
+    }
+    
+    .jdp-header {
+        background: linear-gradient(135deg, #3498db, #2c3e50) !important;
+        padding: 12px !important;
+    }
+    
+    .jdp-months {
+        padding: 10px !important;
+    }
+    
+    .jdp-days span {
+        width: 36px !important;
+        height: 36px !important;
+        line-height: 36px !important;
+        margin: 2px !important;
+        border-radius: 50% !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .jdp-days span:hover:not(.jdp-day-disabled) {
+        background-color: rgba(52, 152, 219, 0.15) !important;
+    }
+    
+    .jdp-day-selected {
+        background-color: #3498db !important;
+    }
+    
+    .jdp-btn-today {
+        color: #3498db !important;
+    }
+    
+    /* Hide the actual deadline input */
+    #id_deadline {
+        display: none;
+    }
+    
+    /* Fix icon alignment */
+    .fas.form-floating-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Category icons styling */
+    .category-icons {
+        padding: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    
+    .category-icon-item {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border: 2px solid transparent;
+        position: relative;
+    }
+    
+    .category-icon-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+    }
+    
+    .category-icon-item.active {
+        background-color: #e9ecef;
+        border-color: var(--secondary-color);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+    
+    .category-icon-item.active::after {
+        content: '';
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 15px;
+        height: 15px;
+        background-color: var(--secondary-color);
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+    
+    .category-icon-item i {
+        font-size: 18px;
+    }
+    
+    /* Priority indicators styling */
+    .priority-indicators {
+        padding: 8px;
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+    
+    .priority-indicator {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 15px;
+        border-radius: 20px;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        border: 2px solid transparent;
+        flex: 1;
+        margin: 0 5px;
+        text-align: center;
+    }
+    
+    .priority-indicator:hover {
+        background-color: #e9ecef;
+        transform: translateY(-2px);
+    }
+    
+    .priority-indicator.active {
+        background-color: #e9ecef;
+        font-weight: bold;
+        border-color: var(--secondary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(0,0,0,0.12);
+    }
+    
+    .priority-indicator i {
+        margin-left: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/persian-date@1.1.0/dist/persian-date.min.js"></script>
+<script src="https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+<script>
+    // Wait for jQuery to be ready
+$(document).ready(function() {
+    console.log("jQuery ready - initializing form components");
+        const $progressRange = $('#{{ form.progress.id_for_label }}');
+        const $progressValue = $('#progressValue');
+        
+        if ($progressRange.length > 0 && $progressValue.length > 0) {
+            $progressRange.on('input', function() {
+                const value = $(this).val();
+                $progressValue.text(value + '%');
+                
+                // Change badge color based on progress value
+                $progressValue.removeClass('bg-success bg-info bg-warning bg-danger').addClass('badge rounded-pill ms-2');
+                if (value >= 75) {
+                    $progressValue.addClass('bg-success');
+                    $('#progressBar').removeClass('bg-info bg-warning bg-danger').addClass('bg-success');
+                } else if (value >= 50) {
+                    $progressValue.addClass('bg-info');
+                    $('#progressBar').removeClass('bg-success bg-warning bg-danger').addClass('bg-info');
+                } else if (value >= 25) {
+                    $progressValue.addClass('bg-warning');
+                    $('#progressBar').removeClass('bg-success bg-info bg-danger').addClass('bg-warning');
+                } else {
+                    $progressValue.addClass('bg-danger');
+                    $('#progressBar').removeClass('bg-success bg-info bg-warning').addClass('bg-danger');
+                }
+                
+                // Update progress bar
+                $('#progressBar').css('width', value + '%').attr('aria-valuenow', value);
+            });
+        }
+        
+        // Initialize Persian Date Picker with jQuery - direct approach
+        try {
+            console.log("Initializing Persian date picker");
+            
+            // Get the current value from the hidden input if it exists
+            const currentValue = $('#{{ form.deadline.id_for_label }}').val();
+            
+            // Initialize the date picker on the visible input
+            $('#date_picker_input').pDatepicker({
+                format: 'YYYY/MM/DD',
+                autoClose: true,
+                initialValue: false,
+                calendar: {
+                    gregorian: {
+                        locale: 'en'
+                    }
+                },
+                calendarType: 'gregorian',
+                onlySelectOnDate: true,
+                timePicker: {
+                    enabled: false
+                },
+                toolbox: {
+                    calendarSwitch: {
+                        enabled: false
+                    }
+                },
+                persianDigit: false,
+                observer: true,
+                responsive: true,
+                position: 'auto',
+                onSelect: function(unix) {
+                    console.log("Date selected", unix);
+                    
+                    // Format date for Django (YYYY-MM-DD)
+                    const date = new Date(unix);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const formattedDate = `${year}-${month}-${day}`;
+                    
+                    // Update the hidden input with the formatted date
+                    $('#{{ form.deadline.id_for_label }}').val(formattedDate);
+                    
+                    // Show the selected date in the visible input
+                    const readableDate = `${year}/${month}/${day}`;
+                    $('#date_picker_input').val(readableDate);
+                },
+                onShow: function() {
+                    $('.datepicker-plot-area').css('z-index', '9999');
+                }
+            });
+            
+            // If there's an existing value, display it in Gregorian format
+            if (currentValue) {
+                const dateParts = currentValue.split('-');
+                if (dateParts.length === 3) {
+                    // Create a gregorian date
+                    const gregorianDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                    const year = gregorianDate.getFullYear();
+                    const month = String(gregorianDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(gregorianDate.getDate()).padStart(2, '0');
+                    
+                    // Display in YYYY/MM/DD format
+                    $('#date_picker_input').val(`${year}/${month}/${day}`);
+                    
+                    // Also initialize the date picker with this value
+                    setTimeout(function() {
+                        $('#date_picker_input').pDatepicker('setDate', gregorianDate.valueOf());
+                    }, 500);
+                }
+            }
+            
+            console.log("Persian date picker initialized");
+            
+        } catch (e) {
+            console.error("Error initializing Persian date picker:", e);
+            console.error(e);
+        }
+        
+        // Add form-control-icon class to inputs with floating icons
+        const inputsWithIcons = document.querySelectorAll('.form-floating-icon');
+        inputsWithIcons.forEach(icon => {
+            const input = icon.nextElementSibling;
+            if (input) {
+                input.classList.add('form-control-icon');
+            }
+        });
+        
+        // Handle category icons with jQuery
+        const $categorySelect = $('#{{ form.category.id_for_label }}');
+        const $categoryIcons = $('.category-icon-item');
+        
+        // Set initial active state
+        if ($categorySelect.length > 0 && $categoryIcons.length > 0) {
+            const currentValue = $categorySelect.val();
+            $categoryIcons.each(function() {
+                if ($(this).data('value') === currentValue) {
+                    $(this).addClass('active');
+                }
+            });
+            
+            // Add click handlers
+            $categoryIcons.on('click', function() {
+                const value = $(this).data('value');
+                
+                // Update select value and trigger change
+                $categorySelect.val(value).trigger('change');
+                
+                // Update active state
+                $categoryIcons.removeClass('active');
+                $(this).addClass('active');
+                
+                // Log for debugging
+                console.log('Category changed to:', value);
+            });
+            
+            // Also listen for changes on the select itself
+            $categorySelect.on('change', function() {
+                const currentValue = $(this).val();
+                $categoryIcons.each(function() {
+                    if ($(this).data('value') === currentValue) {
+                        $(this).addClass('active');
+                    } else {
+                        $(this).removeClass('active');
+                    }
+                });
+            });
+        }
+        
+        // Handle priority indicators with jQuery
+        const $prioritySelect = $('#{{ form.priority.id_for_label }}');
+        const $priorityIndicators = $('.priority-indicator');
+        
+        // Set initial active state
+        if ($prioritySelect.length > 0 && $priorityIndicators.length > 0) {
+            const currentValue = $prioritySelect.val();
+            $priorityIndicators.each(function() {
+                if ($(this).data('value') === currentValue) {
+                    $(this).addClass('active');
+                }
+            });
+            
+            // Add click handlers
+            $priorityIndicators.on('click', function() {
+                const value = $(this).data('value');
+                
+                // Update select value and trigger change
+                $prioritySelect.val(value).trigger('change');
+                
+                // Update active state
+                $priorityIndicators.removeClass('active');
+                $(this).addClass('active');
+                
+                // Log for debugging
+                console.log('Priority changed to:', value);
+            });
+            
+            // Also listen for changes on the select itself
+            $prioritySelect.on('change', function() {
+                const currentValue = $(this).val();
+                $priorityIndicators.each(function() {
+                    if ($(this).data('value') === currentValue) {
+                        $(this).addClass('active');
+                    } else {
+                        $(this).removeClass('active');
+                    }
+                });
+            });
+        }
+    });
+    
+    // Fallback initialization with jQuery
+    setTimeout(function() {
+        console.log("jQuery fallback initialization");
+        
+        // Check if category icons are initialized
+        if ($('.category-icon-item.active').length === 0) {
+            const currentValue = $('#{{ form.category.id_for_label }}').val();
+            $('.category-icon-item').each(function() {
+                if ($(this).data('value') === currentValue) {
+                    $(this).addClass('active');
+                }
+            });
+        }
+        
+        // Check if priority indicators are initialized
+        if ($('.priority-indicator.active').length === 0) {
+            const currentValue = $('#{{ form.priority.id_for_label }}').val();
+            $('.priority-indicator').each(function() {
+                if ($(this).data('value') === currentValue) {
+                    $(this).addClass('active');
+                }
+            });
+        }
+    }, 500);
+</script>
+{% endblock %} 

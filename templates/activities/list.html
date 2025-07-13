@@ -1,0 +1,97 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}فعالیت‌ها | OUrLove{% endblock %}
+
+{% block extra_css %}
+<style>
+    .activities-header {
+        background: linear-gradient(135deg, #29b6f6, #03a9f4);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(3, 169, 244, 0.2);
+    }
+    .activity-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+        background: white;
+    }
+    .activity-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+    }
+    .activity-body {
+        padding: 20px;
+    }
+    .activity-title {
+        font-weight: bold;
+    }
+    .activity-points {
+        font-weight: bold;
+        color: #ffc107;
+    }
+    .complete-btn {
+        background: linear-gradient(135deg, #29b6f6, #03a9f4);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 8px 20px;
+        font-weight: 500;
+    }
+    .completed-badge {
+        background-color: #4caf50;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 50px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4 mb-5">
+    <div class="activities-header">
+        <h2 class="h4 mb-0">انجام فعالیت، کسب امتیاز</h2>
+        <p class="mb-0">با انجام این فعالیت‌ها امتیاز کسب کنید و از فروشگاه جوایز خرید کنید!</p>
+    </div>
+
+    <div class="row">
+        {% for item in activities %}
+        <div class="col-md-6 col-lg-4">
+            <div class="activity-card">
+                <div class="activity-body">
+                    <h5 class="activity-title">{{ item.activity.title }}</h5>
+                    <p class="text-muted">{{ item.activity.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="activity-points">
+                            <i class="fas fa-coins"></i>
+                            {{ item.activity.points }} امتیاز
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <form method="post" action="{% url 'activities:complete' item.activity.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn complete-btn">انجام دادم!</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <span class="badge bg-success">شما: {{ item.user_completions }}</span>
+                        {% if partner %}
+                        <span class="badge bg-info">{{ partner.username }}: {{ item.partner_completions }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <p>در حال حاضر فعالیتی برای انجام وجود ندارد.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

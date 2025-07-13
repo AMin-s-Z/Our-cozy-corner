@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}OUrLove - اپلیکیشن عاشقانه ما{% endblock %}</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#FF4081">
+    <meta name="description" content="اپلیکیشن عاشقانه برای ثبت خاطرات، اهداف و لحظات مشترک">
+    <link rel="manifest" href="{% url 'manifest' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/icons/icon-192x192.svg' %}">
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/icons/icon-192x192.svg' %}">
+    <link rel="shortcut icon" href="{% static 'images/icons/icon-192x192.svg' %}">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="{% static 'css/style.css' %}" as="style">
+    <link rel="preload" href="{% static 'js/main.js' %}" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" as="style">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Critical CSS -->
+    <style>
+        body{font-family:IRANSans,serif;background-color:#f8f9fa;color:#3A3A3A;overflow-x:hidden}
+        .app-container{display:flex;flex-direction:column;min-height:100vh;padding-top:60px;padding-bottom:60px}
+        .main-content{flex:1}
+        .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;box-shadow:0 -2px 10px rgba(0,0,0,0.1);z-index:1000;padding:10px 0}
+    </style>
+    
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    
+    <!-- Tabler Icons - load asynchronously -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"></noscript>
+    
+    <!-- Font Awesome - load asynchronously -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"></noscript>
+    
+    <!-- Persian Date Picker - load only when needed -->
+    {% block datepicker_css %}{% endblock %}
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        {% if user.is_authenticated %}
+            {% include 'base/navbar.html' %}
+        {% endif %}
+        
+        <main class="main-content">
+            {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </main>
+        
+        {% if user.is_authenticated %}
+            {% include 'base/bottom_nav.html' %}
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+    
+    <!-- Persian Date Picker - load only when needed -->
+    {% block datepicker_js %}{% endblock %}
+    
+    <!-- Chart.js - load only when needed -->
+    {% block chartjs %}{% endblock %}
+    
+    <!-- Offline indicator -->
+    <div id="offline-indicator" class="offline-indicator" style="display:none;">
+        <i class="fas fa-wifi-slash me-2"></i> شما آفلاین هستید
+    </div>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                    .then((reg) => console.log('Service Worker registered'))
+                    .catch((err) => console.log('Service Worker registration failed', err));
+                    
+                // Check for updates to the service worker
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    console.log('Service worker updated, reloading page...');
+                    window.location.reload();
+                });
+            });
+        }
+    </script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{% static 'js/main.js' %}" defer></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
