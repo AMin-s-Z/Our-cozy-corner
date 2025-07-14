@@ -1,0 +1,520 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ note.title }} | OUrLove{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Note detail container */
+    .note-container {
+        padding: 20px;
+    }
+    
+    .note-detail {
+        background-color: #fff;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+    }
+    
+    .note-header {
+        background: linear-gradient(135deg, #2C3E50, #4CA1AF);
+        color: white;
+        padding: 30px;
+        position: relative;
+    }
+    
+    .note-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    
+    .note-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .note-meta-item {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 12px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .note-meta-item i {
+        margin-left: 8px;
+    }
+    
+    .note-tags {
+        margin-top: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .note-tag {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+    
+    .note-tag-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: white;
+        margin-left: 8px;
+        display: inline-block;
+    }
+    
+    .note-body {
+        padding: 30px;
+    }
+    
+    .note-content {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #333;
+    }
+    
+    /* For blockquotes in the rich text editor content */
+    .note-content blockquote {
+        border-right: 4px solid #4CA1AF;
+        padding: 10px 20px;
+        margin: 20px 0;
+        background-color: #f9f9f9;
+        font-style: italic;
+    }
+    
+    .note-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+    
+    .note-content h2, .note-content h3, .note-content h4 {
+        margin-top: 30px;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    
+    .note-content pre {
+        background-color: #f5f5f5;
+        padding: 15px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 20px 0;
+    }
+    
+    .note-content ul, .note-content ol {
+        margin-bottom: 20px;
+        padding-right: 20px;
+    }
+    
+    .note-content li {
+        margin-bottom: 8px;
+    }
+    
+    .note-footer {
+        background-color: #f9f9f9;
+        padding: 20px 30px;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .note-dates {
+        font-size: 0.9rem;
+        color: #777;
+    }
+    
+    .note-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    /* Attachments */
+    .note-attachments {
+        margin-top: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .attachments-header {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .attachment-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .attachment-item {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .attachment-icon {
+        width: 50px;
+        height: 50px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #777;
+        margin-bottom: 10px;
+    }
+    
+    .attachment-icon.pdf { color: #F44336; }
+    .attachment-icon.image { color: #4CAF50; }
+    .attachment-icon.doc { color: #2196F3; }
+    .attachment-icon.excel { color: #4CAF50; }
+    .attachment-icon.zip { color: #FFC107; }
+    
+    .attachment-name {
+        font-weight: 500;
+        margin-bottom: 5px;
+        word-break: break-all;
+    }
+    
+    .attachment-details {
+        font-size: 0.8rem;
+        color: #777;
+    }
+    
+    .attachment-actions {
+        margin-top: auto;
+        padding-top: 10px;
+    }
+    
+    /* Related notes */
+    .related-notes {
+        margin-top: 30px;
+    }
+    
+    .related-section {
+        margin-bottom: 30px;
+    }
+    
+    .related-header {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .related-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+    }
+    
+    .related-note {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        display: flex;
+        border-right: 3px solid #4CA1AF;
+    }
+    
+    .related-note:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .related-note-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .related-note-date {
+        font-size: 0.8rem;
+        color: #777;
+    }
+    
+    /* Priority indicator */
+    .priority-indicator {
+        width: 8px;
+        margin-left: 15px;
+        flex-shrink: 0;
+        border-radius: 4px;
+    }
+    
+    .priority-1 { background-color: #4CAF50; }  /* Low */
+    .priority-2 { background-color: #2196F3; }  /* Medium */
+    .priority-3 { background-color: #FFC107; }  /* High */
+    .priority-4 { background-color: #F44336; }  /* Urgent */
+    
+    /* Back button */
+    .back-link {
+        color: #333;
+        text-decoration: none;
+        margin-bottom: 20px;
+        display: inline-flex;
+        align-items: center;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .back-link:hover {
+        color: #4CA1AF;
+        transform: translateX(-3px);
+    }
+    
+    .back-link i {
+        margin-left: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="note-container">
+    <a href="{% url 'notes:list' %}" class="back-link">
+        <i class="fas fa-arrow-right"></i>
+        بازگشت به یادداشت‌ها
+    </a>
+    
+    <div class="note-detail">
+        <div class="note-header">
+            <h1 class="note-title">{{ note.title }}</h1>
+            
+            <div class="note-meta">
+                <div class="note-meta-item">
+                    <i class="fas fa-user"></i>
+                    {{ note.user.get_full_name|default:note.user.username }}
+                </div>
+                
+                <div class="note-meta-item">
+                    <i class="fas fa-calendar"></i>
+                    {{ note.created_at|date:"Y/m/d" }}
+                </div>
+                
+                {% if note.is_pinned %}
+                <div class="note-meta-item">
+                    <i class="fas fa-thumbtack"></i>
+                    سنجاق شده
+                </div>
+                {% endif %}
+                
+                <div class="note-meta-item">
+                    {% if note.priority == 1 %}
+                    <i class="fas fa-arrow-down text-success"></i>
+                    {% elif note.priority == 2 %}
+                    <i class="fas fa-minus text-info"></i>
+                    {% elif note.priority == 3 %}
+                    <i class="fas fa-arrow-up text-warning"></i>
+                    {% else %}
+                    <i class="fas fa-exclamation-circle text-danger"></i>
+                    {% endif %}
+                    {{ note.get_priority_display }}
+                </div>
+                
+                <div class="note-meta-item">
+                    {% if note.status == 'draft' %}
+                    <i class="fas fa-edit text-warning"></i>
+                    {% elif note.status == 'published' %}
+                    <i class="fas fa-check-circle text-success"></i>
+                    {% else %}
+                    <i class="fas fa-archive text-secondary"></i>
+                    {% endif %}
+                    {{ note.get_status_display }}
+                </div>
+                
+                {% if note.reminder_date %}
+                <div class="note-meta-item {% if note.is_overdue %}text-danger{% endif %}">
+                    <i class="fas {% if note.is_overdue %}fa-exclamation-circle{% else %}fa-bell{% endif %}"></i>
+                    یادآوری: {{ note.reminder_date|date:"Y/m/d H:i" }}
+                </div>
+                {% endif %}
+                
+                {% if note.category %}
+                <div class="note-meta-item">
+                    {% if note.category.icon %}
+                    <i class="fas {{ note.category.icon }}"></i>
+                    {% else %}
+                    <i class="fas fa-folder"></i>
+                    {% endif %}
+                    {{ note.category.name }}
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if note.tags.exists %}
+            <div class="note-tags">
+                {% for tag in note.tags.all %}
+                <div class="note-tag">
+                    <span class="note-tag-dot" style="background-color: {{ tag.color|default:'white' }}"></span>
+                    {{ tag.name }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="note-body">
+            <div class="note-content">
+                {{ note.content|safe }}
+            </div>
+        </div>
+        
+        <div class="note-footer">
+            <div class="note-dates">
+                <div>ایجاد شده: {{ note.created_at|date:"Y/m/d H:i" }}</div>
+                <div>آخرین بروزرسانی: {{ note.updated_at|date:"Y/m/d H:i" }}</div>
+            </div>
+            
+            {% if note.user == request.user %}
+            <div class="note-actions">
+                <a href="{% url 'notes:update' note.slug %}" class="btn btn-primary">
+                    <i class="fas fa-edit me-1"></i>
+                    ویرایش
+                </a>
+                
+                <a href="{% url 'notes:toggle_pin' note.slug %}" class="btn {% if note.is_pinned %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                    <i class="fas fa-thumbtack me-1"></i>
+                    {% if note.is_pinned %}
+                    حذف سنجاق
+                    {% else %}
+                    سنجاق کردن
+                    {% endif %}
+                </a>
+                
+                {% if note.reminder_date and not note.is_reminded %}
+                <form method="post" action="{% url 'notes:mark_reminded' note.slug %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check-circle me-1"></i>
+                        انجام یادآوری
+                    </button>
+                </form>
+                {% endif %}
+                
+                <a href="{% url 'notes:delete' note.slug %}" class="btn btn-outline-danger">
+                    <i class="fas fa-trash-alt me-1"></i>
+                    حذف
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if attachments %}
+    <div class="note-attachments">
+        <h3 class="attachments-header">فایل‌های پیوست</h3>
+        <div class="attachment-list">
+            {% for attachment in attachments %}
+            <div class="attachment-item">
+                <div class="attachment-icon {% if attachment.file_type == 'pdf' %}pdf{% elif attachment.file_type == 'jpg' or attachment.file_type == 'png' or attachment.file_type == 'gif' or attachment.file_type == 'jpeg' %}image{% elif attachment.file_type == 'doc' or attachment.file_type == 'docx' %}doc{% elif attachment.file_type == 'xls' or attachment.file_type == 'xlsx' %}excel{% elif attachment.file_type == 'zip' or attachment.file_type == 'rar' %}zip{% endif %}">
+                    {% if attachment.file_type == 'pdf' %}
+                    <i class="fas fa-file-pdf"></i>
+                    {% elif attachment.file_type == 'jpg' or attachment.file_type == 'png' or attachment.file_type == 'gif' or attachment.file_type == 'jpeg' %}
+                    <i class="fas fa-file-image"></i>
+                    {% elif attachment.file_type == 'doc' or attachment.file_type == 'docx' %}
+                    <i class="fas fa-file-word"></i>
+                    {% elif attachment.file_type == 'xls' or attachment.file_type == 'xlsx' %}
+                    <i class="fas fa-file-excel"></i>
+                    {% elif attachment.file_type == 'zip' or attachment.file_type == 'rar' %}
+                    <i class="fas fa-file-archive"></i>
+                    {% else %}
+                    <i class="fas fa-file"></i>
+                    {% endif %}
+                </div>
+                <div class="attachment-name">{{ attachment.name }}</div>
+                <div class="attachment-details">
+                    {{ attachment.file_type|upper }}
+                    {% if attachment.file_size %}
+                    • {{ attachment.file_size|filesizeformat }}
+                    {% endif %}
+                </div>
+                <div class="attachment-actions">
+                    <div class="btn-group btn-group-sm w-100">
+                        <a href="{{ attachment.file.url }}" class="btn btn-outline-primary" download>
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <a href="{{ attachment.file.url }}" class="btn btn-outline-secondary" target="_blank">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        {% if note.user == request.user %}
+                        <a href="{% url 'notes:attachment_delete' attachment.id %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Related notes -->
+    <div class="related-notes">
+        {% if related_by_category %}
+        <div class="related-section">
+            <h3 class="related-header">یادداشت‌های مرتبط با همین دسته‌بندی</h3>
+            <div class="related-list">
+                {% for related in related_by_category %}
+                <a href="{% url 'notes:detail' related.slug %}" class="text-decoration-none">
+                    <div class="related-note">
+                        <div class="priority-indicator priority-{{ related.priority }}"></div>
+                        <div>
+                            <div class="related-note-title">{{ related.title }}</div>
+                            <div class="related-note-date">{{ related.created_at|date:"Y/m/d" }}</div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if related_by_tags %}
+        <div class="related-section">
+            <h3 class="related-header">یادداشت‌های مرتبط با برچسب‌های مشابه</h3>
+            <div class="related-list">
+                {% for related in related_by_tags %}
+                <a href="{% url 'notes:detail' related.slug %}" class="text-decoration-none">
+                    <div class="related-note">
+                        <div class="priority-indicator priority-{{ related.priority }}"></div>
+                        <div>
+                            <div class="related-note-title">{{ related.title }}</div>
+                            <div class="related-note-date">{{ related.created_at|date:"Y/m/d" }}</div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

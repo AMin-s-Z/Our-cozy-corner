@@ -1,0 +1,254 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "یادآوری‌ها" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reminders-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .reminder-section {
+        margin-bottom: 30px;
+    }
+    
+    .reminder-section h2 {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .reminder-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .reminder-card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    
+    .reminder-card.overdue {
+        border-right: 4px solid #dc3545;
+    }
+    
+    .reminder-card.today {
+        border-right: 4px solid #ffc107;
+    }
+    
+    .reminder-card.upcoming {
+        border-right: 4px solid #28a745;
+    }
+    
+    .reminder-content {
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .reminder-info {
+        flex-grow: 1;
+    }
+    
+    .reminder-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .reminder-date {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    
+    .reminder-snippet {
+        font-size: 0.9rem;
+        color: #555;
+        margin-bottom: 0;
+    }
+    
+    .reminder-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .reminder-actions a, .reminder-actions button {
+        padding: 8px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .empty-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        color: #6c757d;
+    }
+    
+    .empty-section i {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reminders-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{% trans "یادآوری‌ها" %}</h1>
+        <a href="{% url 'notes:list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-right ml-2"></i>
+            {% trans "بازگشت به یادداشت‌ها" %}
+        </a>
+    </div>
+    
+    <!-- Overdue Reminders -->
+    <div class="reminder-section">
+        <h2>
+            <i class="fas fa-exclamation-circle text-danger me-2"></i>
+            {% trans "یادآوری‌های گذشته" %}
+            {% if overdue %}
+            <span class="badge bg-danger">{{ overdue|length }}</span>
+            {% endif %}
+        </h2>
+        
+        {% if overdue %}
+            {% for note in overdue %}
+            <div class="reminder-card overdue">
+                <div class="reminder-content">
+                    <div class="reminder-info">
+                        <h3 class="reminder-title">{{ note.title }}</h3>
+                        <div class="reminder-date">
+                            <i class="fas fa-calendar-times me-1"></i>
+                            {{ note.reminder_date|date:"Y/m/d H:i" }}
+                        </div>
+                        <p class="reminder-snippet">{{ note.snippet }}</p>
+                    </div>
+                    <div class="reminder-actions">
+                        <form method="post" action="{% url 'notes:mark_reminded' note.slug %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="fas fa-check me-1"></i>
+                                {% trans "انجام شد" %}
+                            </button>
+                        </form>
+                        <a href="{% url 'notes:detail' note.slug %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye me-1"></i>
+                            {% trans "مشاهده" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-section">
+                <i class="fas fa-check-circle"></i>
+                <h4>{% trans "هیچ یادآوری گذشته‌ای ندارید" %}</h4>
+                <p>{% trans "همه یادآوری‌های گذشته انجام شده‌اند" %}</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Today's Reminders -->
+    <div class="reminder-section">
+        <h2>
+            <i class="fas fa-bell text-warning me-2"></i>
+            {% trans "یادآوری‌های امروز" %}
+            {% if today %}
+            <span class="badge bg-warning text-dark">{{ today|length }}</span>
+            {% endif %}
+        </h2>
+        
+        {% if today %}
+            {% for note in today %}
+            <div class="reminder-card today">
+                <div class="reminder-content">
+                    <div class="reminder-info">
+                        <h3 class="reminder-title">{{ note.title }}</h3>
+                        <div class="reminder-date">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ note.reminder_date|date:"H:i" }}
+                        </div>
+                        <p class="reminder-snippet">{{ note.snippet }}</p>
+                    </div>
+                    <div class="reminder-actions">
+                        <form method="post" action="{% url 'notes:mark_reminded' note.slug %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="fas fa-check me-1"></i>
+                                {% trans "انجام شد" %}
+                            </button>
+                        </form>
+                        <a href="{% url 'notes:detail' note.slug %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye me-1"></i>
+                            {% trans "مشاهده" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-section">
+                <i class="fas fa-calendar-day"></i>
+                <h4>{% trans "هیچ یادآوری برای امروز ندارید" %}</h4>
+                <p>{% trans "برنامه امروز شما خالی است" %}</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Upcoming Reminders -->
+    <div class="reminder-section">
+        <h2>
+            <i class="fas fa-calendar-alt text-success me-2"></i>
+            {% trans "یادآوری‌های آینده" %}
+            {% if upcoming %}
+            <span class="badge bg-success">{{ upcoming|length }}</span>
+            {% endif %}
+        </h2>
+        
+        {% if upcoming %}
+            {% for note in upcoming %}
+            <div class="reminder-card upcoming">
+                <div class="reminder-content">
+                    <div class="reminder-info">
+                        <h3 class="reminder-title">{{ note.title }}</h3>
+                        <div class="reminder-date">
+                            <i class="fas fa-calendar me-1"></i>
+                            {{ note.reminder_date|date:"Y/m/d H:i" }}
+                        </div>
+                        <p class="reminder-snippet">{{ note.snippet }}</p>
+                    </div>
+                    <div class="reminder-actions">
+                        <a href="{% url 'notes:detail' note.slug %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye me-1"></i>
+                            {% trans "مشاهده" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-section">
+                <i class="fas fa-calendar-plus"></i>
+                <h4>{% trans "هیچ یادآوری آینده‌ای ندارید" %}</h4>
+                <p>{% trans "می‌توانید در یادداشت‌های خود یادآوری تنظیم کنید" %}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

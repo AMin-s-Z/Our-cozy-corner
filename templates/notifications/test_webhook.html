@@ -1,0 +1,152 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}تست وب‌هوک | OUrLove{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">تست سیستم وب‌هوک</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">از این صفحه برای تست ارسال نوتیفیکیشن از طریق وب‌هوک استفاده کنید. با کلیک روی دکمه زیر، یک نوتیفیکیشن آزمایشی برای همسر شما ارسال می‌شود.</p>
+                    
+                    <div class="alert alert-info">
+                        <strong>نکته:</strong> این تست فقط در صورتی موفق خواهد بود که تنظیمات وب‌هوک به درستی انجام شده باشد و همسر شما در سیستم ثبت شده باشد.
+                    </div>
+                    
+                    <div id="result-container" class="mb-4" style="display: none;">
+                        <div id="result-message" class="alert"></div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button id="test-button" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i> ارسال نوتیفیکیشن آزمایشی
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">اطلاعات سیستم وب‌هوک</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>آدرس وب‌هوک:</h6>
+                        <code id="webhook-url" class="d-block bg-light p-2 rounded">{{ webhook_url }}</code>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>وضعیت فعلی:</h6>
+                        <div id="webhook-status" class="badge bg-secondary">در حال بررسی...</div>
+                    </div>
+                    
+                    <div>
+                        <h6>گزارش خطاها:</h6>
+                        <pre id="error-log" class="bg-light p-2 rounded" style="max-height: 200px; overflow-y: auto;">در حال بارگذاری...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const testButton = document.getElementById('test-button');
+    const resultContainer = document.getElementById('result-container');
+    const resultMessage = document.getElementById('result-message');
+    const webhookStatus = document.getElementById('webhook-status');
+    const errorLog = document.getElementById('error-log');
+    
+    // Check webhook status
+    checkWebhookStatus();
+    
+    testButton.addEventListener('click', function() {
+        testButton.disabled = true;
+        testButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> در حال ارسال...';
+        
+        // Send test notification
+        fetch('{% url "notifications:test_webhook" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            resultContainer.style.display = 'block';
+            
+            if (data.success) {
+                resultMessage.className = 'alert alert-success';
+                resultMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i> ' + data.message;
+            } else {
+                resultMessage.className = 'alert alert-danger';
+                resultMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i> ' + data.message;
+            }
+            
+            // Update webhook status
+            checkWebhookStatus();
+        })
+        .catch(error => {
+            resultContainer.style.display = 'block';
+            resultMessage.className = 'alert alert-danger';
+            resultMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i> خطا در ارسال درخواست: ' + error.message;
+        })
+        .finally(() => {
+            testButton.disabled = false;
+            testButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i> ارسال نوتیفیکیشن آزمایشی';
+        });
+    });
+    
+    function checkWebhookStatus() {
+        webhookStatus.className = 'badge bg-warning';
+        webhookStatus.innerHTML = 'در حال بررسی...';
+        
+        // Use the real status check endpoint
+        fetch('{% url "notifications:webhook_status" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_available) {
+                    webhookStatus.className = 'badge bg-success';
+                    webhookStatus.innerHTML = 'فعال';
+                    errorLog.innerHTML = 'هیچ خطایی ثبت نشده است.';
+                } else {
+                    webhookStatus.className = 'badge bg-danger';
+                    webhookStatus.innerHTML = 'غیرفعال';
+                    errorLog.innerHTML = data.message + '\nزمان: ' + new Date().toLocaleString();
+                }
+            })
+            .catch(error => {
+                webhookStatus.className = 'badge bg-danger';
+                webhookStatus.innerHTML = 'خطا';
+                errorLog.innerHTML = 'خطای بررسی وضعیت: ' + error.message + '\nزمان: ' + new Date().toLocaleString();
+            });
+    }
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %} 

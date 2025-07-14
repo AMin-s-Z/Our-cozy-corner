@@ -1,0 +1,769 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} | OUrLove{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css">
+<style>
+    /* Form container styling */
+    .note-form-container {
+        padding: 20px;
+    }
+    
+    .form-header {
+        margin-bottom: 25px;
+    }
+    
+    .form-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0;
+        color: #2C3E50;
+    }
+    
+    .form-subtitle {
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+    
+    .form-card {
+        background-color: #fff;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+    }
+    
+    /* Form fields */
+    .form-section {
+        margin-bottom: 25px;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #2C3E50;
+    }
+    
+    .form-switch {
+        margin-top: 5px;
+    }
+    
+    .form-check-label {
+        margin-right: 8px;
+    }
+    
+    /* Select2 styling */
+    .select2-container--bootstrap .select2-selection {
+        border-radius: 8px;
+        padding: 5px;
+        height: auto;
+        min-height: 38px;
+        border: 1px solid #ddd;
+    }
+    
+    .select2-container--bootstrap .select2-selection--multiple .select2-selection__choice {
+        background-color: #f0f0f0;
+        border: 1px solid #e0e0e0;
+        border-radius: 20px;
+        padding: 5px 10px;
+        margin: 3px;
+    }
+    
+    .select2-container--bootstrap .select2-selection--multiple .select2-selection__choice__remove {
+        margin-right: 5px;
+        color: #777;
+    }
+    
+    .select2-container--bootstrap .select2-dropdown {
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Rich text editor */
+    .django-ckeditor-widget {
+        width: 100% !important;
+    }
+    
+    /* Special styling for the status and priority section */
+    .priority-select {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .priority-item {
+        flex: 1;
+        text-align: center;
+        padding: 15px 10px;
+        border-radius: 8px;
+        background-color: #f5f5f5;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        border: 2px solid transparent;
+    }
+    
+    .priority-item input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+    
+    .priority-item label {
+        cursor: pointer;
+        display: block;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+    
+    .priority-item i {
+        display: block;
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+    
+    .priority-item.priority-1 { color: #4CAF50; }
+    .priority-item.priority-2 { color: #2196F3; }
+    .priority-item.priority-3 { color: #FFC107; }
+    .priority-item.priority-4 { color: #F44336; }
+    
+    .priority-item.selected {
+        border-color: currentColor;
+        background-color: rgba(0, 0, 0, 0.05);
+        transform: translateY(-3px);
+    }
+    
+    .status-select {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .status-item {
+        flex: 1;
+        text-align: center;
+        padding: 15px 10px;
+        border-radius: 8px;
+        background-color: #f5f5f5;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        border: 2px solid transparent;
+    }
+    
+    .status-item input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+    
+    .status-item label {
+        cursor: pointer;
+        display: block;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+    
+    .status-item i {
+        display: block;
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+    
+    .status-item.draft { color: #FFC107; }
+    .status-item.published { color: #4CAF50; }
+    .status-item.archived { color: #9E9E9E; }
+    
+    .status-item.selected {
+        border-color: currentColor;
+        background-color: rgba(0, 0, 0, 0.05);
+        transform: translateY(-3px);
+    }
+    
+    /* File attachments */
+    .attachments-section {
+        margin-top: 25px;
+    }
+    
+    .attachments-header {
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    
+    .attachment-dropzone {
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background-color: #f9f9f9;
+        margin-bottom: 15px;
+    }
+    
+    .attachment-dropzone:hover {
+        border-color: #4CA1AF;
+        background-color: #f0f0f0;
+    }
+    
+    .dropzone-icon {
+        font-size: 2.5rem;
+        color: #777;
+        margin-bottom: 10px;
+    }
+    
+    .attachment-list {
+        margin-top: 15px;
+        border-top: 1px solid #f0f0f0;
+        padding-top: 15px;
+    }
+    
+    .attachment-item {
+        display: flex;
+        align-items: center;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-bottom: 8px;
+    }
+    
+    .attachment-icon {
+        font-size: 1.2rem;
+        margin-left: 15px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .attachment-name {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .attachment-size {
+        color: #777;
+        font-size: 0.8rem;
+        margin-left: 10px;
+    }
+    
+    .attachment-actions {
+        margin-right: 15px;
+    }
+    
+    .attachment-actions a {
+        color: #777;
+        margin-left: 10px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+    
+    .attachment-actions a:hover {
+        color: #4CA1AF;
+    }
+    
+    .attachment-actions .delete-attachment:hover {
+        color: #F44336;
+    }
+    
+    /* Form footer */
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="note-form-container">
+    <!-- Header -->
+    <div class="form-header">
+        <a href="{% url 'notes:list' %}" class="btn btn-outline-secondary mb-3">
+            <i class="fas fa-arrow-right me-2"></i>
+            بازگشت
+        </a>
+        <h1 class="form-title">{{ title }}</h1>
+        <p class="form-subtitle">اطلاعات یادداشت را وارد کنید</p>
+    </div>
+    
+    <!-- Form -->
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        
+        <!-- Main Information -->
+        <div class="form-card">
+            <div class="form-section">
+                <h3 class="section-title">اطلاعات اصلی</h3>
+                
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">عنوان یادداشت</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger mt-1 small">
+                            {% for error in form.title.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.content.id_for_label }}" class="form-label">محتوای یادداشت</label>
+                    {{ form.content }}
+                    {% if form.content.errors %}
+                        <div class="text-danger mt-1 small">
+                            {% for error in form.content.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.snippet.id_for_label }}" class="form-label">خلاصه (اختیاری)</label>
+                    {{ form.snippet }}
+                    {% if form.snippet.errors %}
+                        <div class="text-danger mt-1 small">
+                            {% for error in form.snippet.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="text-muted small mt-1">
+                        خلاصه کوتاهی از یادداشت که در لیست نمایش داده می‌شود. اگر خالی بگذارید، به صورت خودکار از متن استخراج می‌شود.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Categorization -->
+            <div class="form-section">
+                <h3 class="section-title">دسته‌بندی و برچسب‌ها</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">دسته‌بندی</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="text-danger mt-1 small">
+                                    {% for error in form.category.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.category_new.id_for_label }}" class="form-label">یا دسته‌بندی جدید بسازید</label>
+                            {{ form.category_new }}
+                            {% if form.category_new.errors %}
+                                <div class="text-danger mt-1 small">
+                                    {% for error in form.category_new.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.tags.id_for_label }}" class="form-label">برچسب‌ها</label>
+                            {{ form.tags }}
+                            {% if form.tags.errors %}
+                                <div class="text-danger mt-1 small">
+                                    {% for error in form.tags.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.tags_new.id_for_label }}" class="form-label">یا برچسب‌های جدید بسازید (با کاما جدا کنید)</label>
+                            {{ form.tags_new }}
+                            {% if form.tags_new.errors %}
+                                <div class="text-danger mt-1 small">
+                                    {% for error in form.tags_new.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status and Priority -->
+            <div class="form-section">
+                <h3 class="section-title">وضعیت و اولویت</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">وضعیت یادداشت</label>
+                        <div class="status-select">
+                            <div class="status-item draft {% if form.status.value == 'draft' or not form.status.value %}selected{% endif %}">
+                                <input type="radio" name="{{ form.status.name }}" id="id_status_draft" value="draft" {% if form.status.value == 'draft' or not form.status.value %}checked{% endif %}>
+                                <label for="id_status_draft">
+                                    <i class="fas fa-edit"></i>
+                                    پیش‌نویس
+                                </label>
+                            </div>
+                            <div class="status-item published {% if form.status.value == 'published' %}selected{% endif %}">
+                                <input type="radio" name="{{ form.status.name }}" id="id_status_published" value="published" {% if form.status.value == 'published' %}checked{% endif %}>
+                                <label for="id_status_published">
+                                    <i class="fas fa-check-circle"></i>
+                                    منتشر شده
+                                </label>
+                            </div>
+                            <div class="status-item archived {% if form.status.value == 'archived' %}selected{% endif %}">
+                                <input type="radio" name="{{ form.status.name }}" id="id_status_archived" value="archived" {% if form.status.value == 'archived' %}checked{% endif %}>
+                                <label for="id_status_archived">
+                                    <i class="fas fa-archive"></i>
+                                    بایگانی
+                                </label>
+                            </div>
+                        </div>
+                        {% if form.status.errors %}
+                            <div class="text-danger mt-1 small">
+                                {% for error in form.status.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">اولویت</label>
+                        <div class="priority-select">
+                            <div class="priority-item priority-1 {% if form.priority.value == 1 %}selected{% endif %}">
+                                <input type="radio" name="{{ form.priority.name }}" id="id_priority_1" value="1" {% if form.priority.value == 1 %}checked{% endif %}>
+                                <label for="id_priority_1">
+                                    <i class="fas fa-arrow-down"></i>
+                                    کم
+                                </label>
+                            </div>
+                            <div class="priority-item priority-2 {% if form.priority.value == 2 or not form.priority.value %}selected{% endif %}">
+                                <input type="radio" name="{{ form.priority.name }}" id="id_priority_2" value="2" {% if form.priority.value == 2 or not form.priority.value %}checked{% endif %}>
+                                <label for="id_priority_2">
+                                    <i class="fas fa-minus"></i>
+                                    متوسط
+                                </label>
+                            </div>
+                            <div class="priority-item priority-3 {% if form.priority.value == 3 %}selected{% endif %}">
+                                <input type="radio" name="{{ form.priority.name }}" id="id_priority_3" value="3" {% if form.priority.value == 3 %}checked{% endif %}>
+                                <label for="id_priority_3">
+                                    <i class="fas fa-arrow-up"></i>
+                                    زیاد
+                                </label>
+                            </div>
+                            <div class="priority-item priority-4 {% if form.priority.value == 4 %}selected{% endif %}">
+                                <input type="radio" name="{{ form.priority.name }}" id="id_priority_4" value="4" {% if form.priority.value == 4 %}checked{% endif %}>
+                                <label for="id_priority_4">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    بسیار زیاد
+                                </label>
+                            </div>
+                        </div>
+                        {% if form.priority.errors %}
+                            <div class="text-danger mt-1 small">
+                                {% for error in form.priority.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-check form-switch mt-4">
+                    {{ form.is_pinned }}
+                    <label class="form-check-label" for="{{ form.is_pinned.id_for_label }}">سنجاق کردن این یادداشت</label>
+                    {% if form.is_pinned.errors %}
+                        <div class="text-danger mt-1 small">
+                            {% for error in form.is_pinned.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Reminder -->
+            <div class="form-section">
+                <h3 class="section-title">یادآوری</h3>
+                
+                <div class="form-group">
+                    <label for="{{ form.reminder_date.id_for_label }}" class="form-label">تاریخ یادآوری (اختیاری)</label>
+                    {{ form.reminder_date }}
+                    {% if form.reminder_date.errors %}
+                        <div class="text-danger mt-1 small">
+                            {% for error in form.reminder_date.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="text-muted small mt-1">
+                        در این تاریخ یک یادآوری برای این یادداشت دریافت خواهید کرد.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Attachments -->
+            <div class="form-section attachments-section">
+                <h3 class="section-title">فایل‌های پیوست</h3>
+                
+                <div class="attachment-dropzone" id="dropzone">
+                    <div class="dropzone-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="dropzone-text">
+                        <div class="h5 mb-2">فایل‌های خود را اینجا بکشید و رها کنید</div>
+                        <div>یا برای انتخاب فایل کلیک کنید</div>
+                    </div>
+                    <input type="file" name="attachments" id="id_attachments" multiple style="display: none;">
+                </div>
+                
+                <div class="attachment-list" id="attachmentList">
+                    <!-- Existing attachments will be listed here -->
+                    {% if attachments %}
+                        {% for attachment in attachments %}
+                            <div class="attachment-item">
+                                <div class="attachment-icon">
+                                    {% if attachment.file_type == 'pdf' %}
+                                    <i class="fas fa-file-pdf"></i>
+                                    {% elif attachment.file_type == 'jpg' or attachment.file_type == 'png' or attachment.file_type == 'gif' or attachment.file_type == 'jpeg' %}
+                                    <i class="fas fa-file-image"></i>
+                                    {% elif attachment.file_type == 'doc' or attachment.file_type == 'docx' %}
+                                    <i class="fas fa-file-word"></i>
+                                    {% elif attachment.file_type == 'xls' or attachment.file_type == 'xlsx' %}
+                                    <i class="fas fa-file-excel"></i>
+                                    {% elif attachment.file_type == 'zip' or attachment.file_type == 'rar' %}
+                                    <i class="fas fa-file-archive"></i>
+                                    {% else %}
+                                    <i class="fas fa-file"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="attachment-name">{{ attachment.name }}</div>
+                                <div class="attachment-size">{{ attachment.file_size|filesizeformat }}</div>
+                                <div class="attachment-actions">
+                                    <a href="{{ attachment.file.url }}" target="_blank" title="نمایش"><i class="fas fa-eye"></i></a>
+                                    <a href="{{ attachment.file.url }}" download title="دانلود"><i class="fas fa-download"></i></a>
+                                    <a href="{% url 'notes:attachment_delete' attachment.id %}" class="delete-attachment" title="حذف"><i class="fas fa-trash-alt"></i></a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Form actions -->
+            <div class="form-actions mt-4">
+                <a href="{% if note %}{% url 'notes:detail' note.slug %}{% else %}{% url 'notes:list' %}{% endif %}" class="btn btn-outline-secondary">لغو</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>
+                    ذخیره یادداشت
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Select2
+        if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
+            $('.select2').select2({
+                theme: 'bootstrap',
+                dir: 'rtl',
+                language: 'fa',
+                placeholder: 'انتخاب کنید',
+                allowClear: true
+            });
+        }
+        
+        // Status selector
+        const statusItems = document.querySelectorAll('.status-item');
+        statusItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove selected class from all items
+                statusItems.forEach(i => i.classList.remove('selected'));
+                // Add selected class to clicked item
+                item.classList.add('selected');
+                // Check the radio button
+                const radio = item.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+        
+        // Priority selector
+        const priorityItems = document.querySelectorAll('.priority-item');
+        priorityItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove selected class from all items
+                priorityItems.forEach(i => i.classList.remove('selected'));
+                // Add selected class to clicked item
+                item.classList.add('selected');
+                // Check the radio button
+                const radio = item.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+        
+        // File upload handling
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('id_attachments');
+        const attachmentList = document.getElementById('attachmentList');
+        
+        // Click on dropzone to trigger file input
+        dropzone.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // Handle drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropzone.classList.add('bg-light');
+        }
+        
+        function unhighlight() {
+            dropzone.classList.remove('bg-light');
+        }
+        
+        // Handle file drop
+        dropzone.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            updateFileList();
+        }
+        
+        // Handle file selection
+        fileInput.addEventListener('change', updateFileList);
+        
+        function updateFileList() {
+            const files = fileInput.files;
+            if (files.length > 0) {
+                const filePreviewsHTML = Array.from(files).map(file => {
+                    let icon = 'fa-file';
+                    if (file.type.includes('pdf')) {
+                        icon = 'fa-file-pdf';
+                    } else if (file.type.includes('image')) {
+                        icon = 'fa-file-image';
+                    } else if (file.type.includes('word')) {
+                        icon = 'fa-file-word';
+                    } else if (file.type.includes('excel') || file.type.includes('sheet')) {
+                        icon = 'fa-file-excel';
+                    } else if (file.type.includes('zip') || file.type.includes('archive')) {
+                        icon = 'fa-file-archive';
+                    }
+                    
+                    return `
+                        <div class="attachment-item">
+                            <div class="attachment-icon">
+                                <i class="fas ${icon}"></i>
+                            </div>
+                            <div class="attachment-name">${file.name}</div>
+                            <div class="attachment-size">${formatFileSize(file.size)}</div>
+                            <div class="attachment-actions">
+                                <a href="#" class="remove-file" data-filename="${file.name}" title="حذف"><i class="fas fa-times"></i></a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                const newFilesContainer = document.createElement('div');
+                newFilesContainer.classList.add('new-files-container');
+                newFilesContainer.innerHTML = filePreviewsHTML;
+                
+                // Remove existing new files container if it exists
+                const existingNewFilesContainer = attachmentList.querySelector('.new-files-container');
+                if (existingNewFilesContainer) {
+                    attachmentList.removeChild(existingNewFilesContainer);
+                }
+                
+                attachmentList.appendChild(newFilesContainer);
+                
+                // Add event listeners for remove buttons
+                const removeButtons = document.querySelectorAll('.remove-file');
+                removeButtons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const filename = this.getAttribute('data-filename');
+                        removeFileFromInput(filename);
+                    });
+                });
+            }
+        }
+        
+        function removeFileFromInput(filename) {
+            const dt = new DataTransfer();
+            const files = fileInput.files;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.name !== filename) {
+                    dt.items.add(file);
+                }
+            }
+            
+            fileInput.files = dt.files;
+            updateFileList();
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes < 1024) {
+                return bytes + ' B';
+            } else if (bytes < 1048576) {
+                return (bytes / 1024).toFixed(1) + ' KB';
+            } else if (bytes < 1073741824) {
+                return (bytes / 1048576).toFixed(1) + ' MB';
+            } else {
+                return (bytes / 1073741824).toFixed(1) + ' GB';
+            }
+        }
+    });
+</script>
+{% endblock %} 
