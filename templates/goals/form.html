@@ -6,9 +6,9 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
 <style>
-    /* Custom styles for Persian Date Picker */
+    /* Custom styles for Gregorian Date Picker */
     .datepicker-plot-area {
-        font-family: 'Vazir', 'Tahoma', sans-serif !important;
+        font-family: 'Estedad', 'Vazir', 'Tahoma', sans-serif !important;
         border-radius: 12px !important;
         box-shadow: 0 5px 20px rgba(0,0,0,0.15) !important;
         z-index: 9999 !important;
@@ -20,6 +20,7 @@
     
     .datepicker-plot-area .datepicker-header .btn-today {
         color: #fff !important;
+        font-weight: bold;
     }
     
     .datepicker-plot-area .datepicker-day-view .table-days td.selected span {
@@ -424,7 +425,7 @@ $(document).ready(function() {
             // Get the current value from the hidden input if it exists
             const currentValue = $('#{{ form.deadline.id_for_label }}').val();
             
-            // Initialize the date picker on the visible input
+            // Initialize the date picker on the visible input with Gregorian calendar only
             $('#date_picker_input').pDatepicker({
                 format: 'YYYY/MM/DD',
                 autoClose: true,

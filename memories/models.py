@@ -14,6 +14,11 @@ class Memory(models.Model):
         ('sad', _('غمگین')),
         ('angry', _('عصبانی')),
         ('neutral', _('خنثی')),
+        ('surprised', _('متعجب')),
+        ('laughing', _('خندان')),
+        ('cool', _('باحال')),
+        ('silly', _('شوخ')),
+        ('thinking', _('متفکر')),
     ]
     
     title = models.CharField(_('عنوان'), max_length=200)
@@ -52,6 +57,11 @@ class Memory(models.Model):
             'sad': 'fa-frown',
             'angry': 'fa-angry',
             'neutral': 'fa-meh',
+            'surprised': 'fa-dizzy',
+            'laughing': 'fa-laugh-squint',
+            'cool': 'fa-glasses',
+            'silly': 'fa-grin-tongue-wink',
+            'thinking': 'fa-lightbulb',
         }
         return icons.get(self.mood, 'fa-smile')
         
@@ -66,6 +76,11 @@ class Memory(models.Model):
             'sad': 'text-primary',
             'angry': 'text-danger',
             'neutral': 'text-secondary',
+            'surprised': 'text-purple',
+            'laughing': 'text-warning',
+            'cool': 'text-primary',
+            'silly': 'text-success',
+            'thinking': 'text-info',
         }
         return colors.get(self.mood, 'text-dark')
         

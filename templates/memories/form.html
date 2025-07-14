@@ -69,12 +69,14 @@
     
     /* Mood Icons Styling */
     .mood-icons {
-        padding: 8px;
+        padding: 12px;
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 12px;
         justify-content: center;
         margin-top: 10px;
+        max-height: 215px;
+        overflow-y: auto;
     }
     
     .mood-icon-item {
@@ -239,6 +241,11 @@
                             <span class="mood-icon-item" data-value="sad" title="غمگین"><i class="fas fa-frown text-primary"></i></span>
                             <span class="mood-icon-item" data-value="angry" title="عصبانی"><i class="fas fa-angry text-danger"></i></span>
                             <span class="mood-icon-item" data-value="neutral" title="خنثی"><i class="fas fa-meh text-secondary"></i></span>
+                            <span class="mood-icon-item" data-value="surprised" title="متعجب"><i class="fas fa-dizzy text-purple"></i></span>
+                            <span class="mood-icon-item" data-value="laughing" title="خندان"><i class="fas fa-laugh-squint text-warning"></i></span>
+                            <span class="mood-icon-item" data-value="cool" title="باحال"><i class="fas fa-glasses text-primary"></i></span>
+                            <span class="mood-icon-item" data-value="silly" title="شوخ"><i class="fas fa-grin-tongue-wink text-success"></i></span>
+                            <span class="mood-icon-item" data-value="thinking" title="متفکر"><i class="fas fa-lightbulb text-info"></i></span>
                         </div>
                         <div class="text-center mt-2 small text-muted">برای انتخاب حس و حال روی آیکون‌ها کلیک کنید</div>
                         {% if form.mood.errors %}
@@ -365,6 +372,22 @@
             format: 'YYYY/MM/DD',
             initialValue: dateInput.value ? true : false,
             autoClose: true,
+            calendar: {
+                gregorian: {
+                    locale: 'en'
+                }
+            },
+            calendarType: 'gregorian',
+            onlySelectOnDate: true,
+            timePicker: {
+                enabled: false
+            },
+            toolbox: {
+                calendarSwitch: {
+                    enabled: false
+                }
+            },
+            persianDigit: false,
             onSelect: function(unix) {
                 const date = new Date(unix);
                 const year = date.getFullYear();

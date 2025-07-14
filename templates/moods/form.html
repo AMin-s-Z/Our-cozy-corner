@@ -228,15 +228,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const moodEmojis = {
         'very_happy': '😁', 'happy': '😊', 'excited': '🤩', 'content': '🙂',
         'relaxed': '😌', 'neutral': '😐', 'confused': '😕', 'anxious': '😟',
-        'sad': '😢', 'frustrated': '😤', 'angry': '😡', 'sleepy': '😴', 'very_sad': '😭'
+        'sad': '😢', 'frustrated': '😤', 'angry': '😡', 'sleepy': '😴', 'very_sad': '😭',
+        'surprised': '😲', 'romantic': '😍', 'laughing': '😂', 'cool': '😎',
+        'proud': '😏', 'silly': '🤪', 'sick': '🤒', 'crazy': '🤯', 'thinking': '🤔'
     };
     
     const moodOptions = document.querySelectorAll('.mood-option');
     moodOptions.forEach(option => {
         const input = option.querySelector('input[type="radio"]');
+        const label = option.querySelector('label');
+        
+        // Skip empty or "--------" labels
+        if (label && label.title === "---------") {
+            // Remove the entire option element
+            option.style.display = 'none';
+            return;
+        }
+        
         if (input) {
             const emoji = moodEmojis[input.value];
-            const label = option.querySelector('label');
             if (label && emoji) {
                 label.textContent = emoji;
             }

@@ -29,6 +29,7 @@ def chrome_devtools_handler(request):
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
     path("", include("core.urls")),
     path("memories/", include("memories.urls")),
     path("goals/", include("goals.urls")),
@@ -36,6 +37,7 @@ urlpatterns = [
     path("rewards/", include("rewards.urls")),
     path("activities/", include("activities.urls")),
     path("notifications/", include("notifications.urls")),
+    path("notes/", include("notes.urls")),
     
     # PWA URLs
     path('manifest.json', core_views.manifest, name='manifest'),

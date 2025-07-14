@@ -20,6 +20,15 @@ class Mood(models.Model):
         ('angry', _('عصبانی')),
         ('sleepy', _('خواب‌آلود')),
         ('very_sad', _('بسیار غمگین')),
+        ('surprised', _('متعجب')),
+        ('romantic', _('عاشقانه')),
+        ('laughing', _('خندان')),
+        ('cool', _('باحال')),
+        ('proud', _('مغرور')),
+        ('silly', _('شوخ')),
+        ('sick', _('بیمار')),
+        ('crazy', _('دیوانه')),
+        ('thinking', _('متفکر')),
     ]
     
     user = models.ForeignKey(
@@ -64,6 +73,15 @@ class Mood(models.Model):
             'angry': '😡',
             'sleepy': '😴',
             'very_sad': '😭',
+            'surprised': '😵',
+            'romantic': '😍',
+            'laughing': '😂',
+            'cool': '😎',
+            'proud': '😏',
+            'silly': '🤪',
+            'sick': '🤒',
+            'crazy': '🤯',
+            'thinking': '🤔',
         }
         return emojis.get(self.mood_type, '😐')
         

@@ -98,15 +98,16 @@ function setupPwaInstall() {
     });
 }
 
-// Format date for display in Persian/Jalali calendar
+// Format date for display in Gregorian calendar
 function getFormattedDate(date) {
-    if (typeof persianDate !== 'undefined') {
-        return new persianDate(date).format('YYYY/MM/DD');
-    }
-    return date.toISOString().split('T')[0]; // Fallback to ISO format
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}/${month}/${day}`;
 }
 
-// Initialize Persian Date Picker on form fields
+// Initialize Date Picker on form fields with Gregorian calendar
 function initPersianDatePicker() {
     // Only initialize if both jQuery and the Persian datepicker plugin are available
     if (typeof $ !== 'undefined' && typeof $.fn.persianDatepicker !== 'undefined') {
@@ -117,13 +118,29 @@ function initPersianDatePicker() {
                     format: 'YYYY/MM/DD',
                     autoClose: true,
                     initialValue: true,
+                    calendar: {
+                        gregorian: {
+                            locale: 'en'
+                        }
+                    },
+                    calendarType: 'gregorian',
+                    onlySelectOnDate: true,
+                    timePicker: {
+                        enabled: false
+                    },
+                    toolbox: {
+                        calendarSwitch: {
+                            enabled: false
+                        }
+                    },
+                    persianDigit: false,
                     onSelect: function() {
                         // Trigger change event for form validation
                         $(this.elem).trigger('change');
                     }
                 });
             } catch (e) {
-                console.warn('Persian datepicker initialization failed:', e);
+                console.warn('Date picker initialization failed:', e);
             }
         }
     }

@@ -9,7 +9,7 @@ class MemoryForm(forms.ModelForm):
         fields = ['title', 'content', 'image', 'mood', 'date', 'location']
         widgets = {
             'date': forms.DateInput(attrs={
-                'class': 'persian-date form-control',
+                'class': 'gregorian-date form-control',
                 'autocomplete': 'off',
                 'data-jdp': '',
                 'placeholder': 'انتخاب تاریخ'

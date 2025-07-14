@@ -15,8 +15,61 @@
                 <span class="logo-text-primary fw-bold"> گوشه </span><span class="logo-text-secondary"> دنج ما </span>
             </div>
         </a>
+        
+        <!-- Main Menu -->
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/dashboard/' %}active{% endif %}" href="{% url 'dashboard' %}">
+                        <i class="fas fa-home me-1"></i> خانه
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if '/memories/' in request.path %}active{% endif %}" href="{% url 'memories:list' %}">
+                        <i class="fas fa-book-open me-1"></i> خاطرات
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if '/goals/' in request.path %}active{% endif %}" href="{% url 'goals:list' %}">
+                        <i class="fas fa-bullseye me-1"></i> اهداف
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if '/notes/' in request.path %}active{% endif %}" href="#" id="notesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-sticky-note me-1"></i> یادداشت‌ها
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="notesDropdown">
+                        <li><a class="dropdown-item" href="{% url 'notes:list' %}">همه یادداشت‌ها</a></li>
+                        <li><a class="dropdown-item" href="{% url 'notes:create' %}">ایجاد یادداشت جدید</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'notes:reminders' %}">یادآوری‌ها</a></li>
+                        <li><a class="dropdown-item" href="{% url 'notes:category_list' %}">دسته‌بندی‌ها</a></li>
+                        <li><a class="dropdown-item" href="{% url 'notes:tag_list' %}">برچسب‌ها</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if '/moods/' in request.path %}active{% endif %}" href="{% url 'moods:list' %}">
+                        <i class="fas fa-heart me-1"></i> حال
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if '/activities/' in request.path %}active{% endif %}" href="{% url 'activities:list' %}">
+                        <i class="fas fa-tasks me-1"></i> فعالیت‌ها
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if '/rewards/' in request.path %}active{% endif %}" href="{% url 'rewards:list' %}">
+                        <i class="fas fa-gift me-1"></i> جوایز
+                    </a>
+                </li>
+            </ul>
+        </div>
 
         <div class="ms-auto d-flex align-items-center">
+            <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
             <div class="dropdown me-3">
                 <a class="text-decoration-none position-relative notification-icon" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-bell fs-5"></i>
@@ -76,7 +129,6 @@
                         </div>
                     </li>
                     <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user-circle me-2"></i> پروفایل</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> تنظیمات</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
                         <form method="post" action="{% url 'logout' %}" id="logout-form" class="m-0">

@@ -49,6 +49,11 @@ INSTALLED_APPS = [
     "rewards.apps.RewardsConfig",
     "activities.apps.ActivitiesConfig",
     "notifications.apps.NotificationsConfig",
+    "notes.apps.NotesConfig",
+    
+    # Third-party apps
+    "ckeditor",
+    "ckeditor_uploader",
 ]
 
 MIDDLEWARE = [
@@ -87,29 +92,29 @@ WSGI_APPLICATION = "OUrProjact.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-#
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'stupefied_bose',
-        'USER': 'root',
-        'PASSWORD': 'VVbEIaEqIzHLOn1BN2OB4ypI',
-        'HOST': 'matterhorn.liara.cloud',
-        'PORT': '30931',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
-        'CONN_MAX_AGE': 600,
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-# 2. Add the CONN_MAX_AGE setting to the 'default' database configuration.
-DATABASES['default']['CONN_MAX_AGE'] = 600
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'stupefied_bose',
+#         'USER': 'root',
+#         'PASSWORD': 'VVbEIaEqIzHLOn1BN2OB4ypI',
+#         'HOST': 'matterhorn.liara.cloud',
+#         'PORT': '30931',
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#         },
+#         'CONN_MAX_AGE': 600,
+#     }
+# }
+# # 2. Add the CONN_MAX_AGE setting to the 'default' database configuration.
+# DATABASES['default']['CONN_MAX_AGE'] = 600
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -225,5 +230,46 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+    },
+}
+
+# CKEditor settings
+CKEDITOR_UPLOAD_PATH = "uploads/ckeditor/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+CKEDITOR_RESTRICT_BY_USER = True
+CKEDITOR_BROWSE_SHOW_DIRS = True
+CKEDITOR_ALLOW_NONIMAGE_FILES = True
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'skin': 'moono-lisa',
+        'toolbar': 'full',
+        'height': 400,
+        'width': '100%',
+        'removePlugins': 'stylesheetparser',
+        'allowedContent': True,
+        'extraPlugins': ','.join([
+            'uploadimage',
+            'uploadwidget',
+            'widget',
+            'dialog',
+            'codesnippet',
+        ]),
+        'codeSnippet_theme': 'monokai_sublime',
+    },
+    'simple': {
+        'toolbar': [
+            {'name': 'styles', 'items': ['Format']},
+            {'name': 'basicstyles',
+             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat']},
+            {'name': 'paragraph',
+             'items': ['NumberedList', 'BulletedList', 'Blockquote']},
+            {'name': 'links', 'items': ['Link', 'Unlink']},
+            {'name': 'insert', 'items': ['Image', 'Table']},
+            {'name': 'tools', 'items': ['Maximize']},
+            {'name': 'document', 'items': ['Source']},
+        ],
+        'height': 300,
+        'width': '100%',
     },
 }
