@@ -6,14 +6,8 @@ class GoalForm(forms.ModelForm):
     """Form for creating and updating goals."""
     class Meta:
         model = Goal
-        fields = ['title', 'description', 'category', 'priority', 'progress', 'deadline']
+        fields = ['title', 'description', 'category', 'priority', 'progress']
         widgets = {
-            'deadline': forms.DateInput(attrs={
-                'class': 'persian-date form-control',
-                'autocomplete': 'off',
-                'placeholder': 'انتخاب تاریخ',
-                'readonly': 'readonly'
-            }),
             'description': forms.Textarea(attrs={'rows': 3}),
             'progress': forms.NumberInput(attrs={'min': 0, 'max': 100}),
         }

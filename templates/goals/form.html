@@ -4,50 +4,8 @@
 {% block title %}{{ title }} | LoveOur{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
 <style>
-    /* Custom styles for Gregorian Date Picker */
-    .datepicker-plot-area {
-        font-family: 'Estedad', 'Vazir', 'Tahoma', sans-serif !important;
-        border-radius: 12px !important;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.15) !important;
-        z-index: 9999 !important;
-    }
-    
-    .datepicker-plot-area .datepicker-header {
-        background: linear-gradient(135deg, #3498db, #2c3e50) !important;
-    }
-    
-    .datepicker-plot-area .datepicker-header .btn-today {
-        color: #fff !important;
-        font-weight: bold;
-    }
-    
-    .datepicker-plot-area .datepicker-day-view .table-days td.selected span {
-        background-color: #3498db !important;
-    }
-    
-    .datepicker-plot-area .datepicker-day-view .table-days td span:hover {
-        background-color: rgba(52, 152, 219, 0.15) !important;
-    }
-    
-    .datepicker-plot-area .datepicker-navigator .pwt-btn-next,
-    .datepicker-plot-area .datepicker-navigator .pwt-btn-prev,
-    .datepicker-plot-area .datepicker-navigator .pwt-btn-switch {
-        color: #fff !important;
-    }
-    
-    /* Fix for date input */
-    input.persian-date {
-        cursor: pointer;
-        background-color: #fff;
-    }
-    
-    /* Ensure date picker is visible */
-    .datepicker-container {
-        z-index: 10000 !important;
-        position: fixed !important;
-    }
+    /* Custom styles for the form */
 </style>
 {% endblock %}
 
@@ -150,22 +108,6 @@
                 </div>
                 
                 <div class="row mb-4">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                        <label for="date_picker_input" class="form-label">مهلت انجام</label>
-                        <div class="position-relative">
-                            <i class="fas fa-calendar-alt form-floating-icon"></i>
-                            <input type="text" id="date_picker_input" class="form-control form-control-icon" placeholder="Select date (YYYY/MM/DD)" autocomplete="off" readonly>
-                            {{ form.deadline }}
-                            <div class="small text-muted mt-1">برای انتخاب تاریخ میلادی کلیک کنید</div>
-                        </div>
-                        {% if form.deadline.errors %}
-                            <div class="text-danger mt-1 small">
-                                {% for error in form.deadline.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
                     <div class="col-md-6">
                         <label for="{{ form.progress.id_for_label }}" class="form-label">پیشرفت <span id="progressValue" class="badge bg-primary rounded-pill ms-2">{{ form.progress.value|default:'0' }}%</span></label>
                         {{ form.progress }}
@@ -382,237 +324,65 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://unpkg.com/persian-date@1.1.0/dist/persian-date.min.js"></script>
-<script src="https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
 <script>
-    // Wait for jQuery to be ready
-$(document).ready(function() {
-    console.log("jQuery ready - initializing form components");
-        const $progressRange = $('#{{ form.progress.id_for_label }}');
-        const $progressValue = $('#progressValue');
-        
-        if ($progressRange.length > 0 && $progressValue.length > 0) {
-            $progressRange.on('input', function() {
-                const value = $(this).val();
-                $progressValue.text(value + '%');
-                
-                // Change badge color based on progress value
-                $progressValue.removeClass('bg-success bg-info bg-warning bg-danger').addClass('badge rounded-pill ms-2');
-                if (value >= 75) {
-                    $progressValue.addClass('bg-success');
-                    $('#progressBar').removeClass('bg-info bg-warning bg-danger').addClass('bg-success');
-                } else if (value >= 50) {
-                    $progressValue.addClass('bg-info');
-                    $('#progressBar').removeClass('bg-success bg-warning bg-danger').addClass('bg-info');
-                } else if (value >= 25) {
-                    $progressValue.addClass('bg-warning');
-                    $('#progressBar').removeClass('bg-success bg-info bg-danger').addClass('bg-warning');
-                } else {
-                    $progressValue.addClass('bg-danger');
-                    $('#progressBar').removeClass('bg-success bg-info bg-warning').addClass('bg-danger');
-                }
-                
-                // Update progress bar
-                $('#progressBar').css('width', value + '%').attr('aria-valuenow', value);
-            });
-        }
-        
-        // Initialize Persian Date Picker with jQuery - direct approach
-        try {
-            console.log("Initializing Persian date picker");
-            
-            // Get the current value from the hidden input if it exists
-            const currentValue = $('#{{ form.deadline.id_for_label }}').val();
-            
-            // Initialize the date picker on the visible input with Gregorian calendar only
-            $('#date_picker_input').pDatepicker({
-                format: 'YYYY/MM/DD',
-                autoClose: true,
-                initialValue: false,
-                calendar: {
-                    gregorian: {
-                        locale: 'en'
-                    }
-                },
-                calendarType: 'gregorian',
-                onlySelectOnDate: true,
-                timePicker: {
-                    enabled: false
-                },
-                toolbox: {
-                    calendarSwitch: {
-                        enabled: false
-                    }
-                },
-                persianDigit: false,
-                observer: true,
-                responsive: true,
-                position: 'auto',
-                onSelect: function(unix) {
-                    console.log("Date selected", unix);
-                    
-                    // Format date for Django (YYYY-MM-DD)
-                    const date = new Date(unix);
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const formattedDate = `${year}-${month}-${day}`;
-                    
-                    // Update the hidden input with the formatted date
-                    $('#{{ form.deadline.id_for_label }}').val(formattedDate);
-                    
-                    // Show the selected date in the visible input
-                    const readableDate = `${year}/${month}/${day}`;
-                    $('#date_picker_input').val(readableDate);
-                },
-                onShow: function() {
-                    $('.datepicker-plot-area').css('z-index', '9999');
-                }
-            });
-            
-            // If there's an existing value, display it in Gregorian format
-            if (currentValue) {
-                const dateParts = currentValue.split('-');
-                if (dateParts.length === 3) {
-                    // Create a gregorian date
-                    const gregorianDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-                    const year = gregorianDate.getFullYear();
-                    const month = String(gregorianDate.getMonth() + 1).padStart(2, '0');
-                    const day = String(gregorianDate.getDate()).padStart(2, '0');
-                    
-                    // Display in YYYY/MM/DD format
-                    $('#date_picker_input').val(`${year}/${month}/${day}`);
-                    
-                    // Also initialize the date picker with this value
-                    setTimeout(function() {
-                        $('#date_picker_input').pDatepicker('setDate', gregorianDate.valueOf());
-                    }, 500);
-                }
-            }
-            
-            console.log("Persian date picker initialized");
-            
-        } catch (e) {
-            console.error("Error initializing Persian date picker:", e);
-            console.error(e);
-        }
-        
-        // Add form-control-icon class to inputs with floating icons
-        const inputsWithIcons = document.querySelectorAll('.form-floating-icon');
-        inputsWithIcons.forEach(icon => {
-            const input = icon.nextElementSibling;
-            if (input) {
-                input.classList.add('form-control-icon');
+document.addEventListener('DOMContentLoaded', function() {
+    // Progress Bar
+    const progressRange = document.getElementById('{{ form.progress.id_for_label }}');
+    const progressValue = document.getElementById('progressValue');
+    const progressBar = document.getElementById('progressBar');
+
+    if (progressRange && progressValue && progressBar) {
+        progressRange.addEventListener('input', function() {
+            const value = this.value;
+            progressValue.textContent = value + '%';
+            progressBar.style.width = value + '%';
+            progressBar.setAttribute('aria-valuenow', value);
+        });
+    }
+
+    // Category Icons
+    const categorySelect = document.getElementById('{{ form.category.id_for_label }}');
+    const categoryIcons = document.querySelectorAll('.category-icon-item');
+
+    if (categorySelect && categoryIcons.length) {
+        const currentCategory = categorySelect.value;
+        categoryIcons.forEach(icon => {
+            if (icon.dataset.value === currentCategory) {
+                icon.classList.add('active');
             }
         });
-        
-        // Handle category icons with jQuery
-        const $categorySelect = $('#{{ form.category.id_for_label }}');
-        const $categoryIcons = $('.category-icon-item');
-        
-        // Set initial active state
-        if ($categorySelect.length > 0 && $categoryIcons.length > 0) {
-            const currentValue = $categorySelect.val();
-            $categoryIcons.each(function() {
-                if ($(this).data('value') === currentValue) {
-                    $(this).addClass('active');
-                }
+
+        categoryIcons.forEach(icon => {
+            icon.addEventListener('click', function() {
+                const value = this.dataset.value;
+                categorySelect.value = value;
+                categoryIcons.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
             });
-            
-            // Add click handlers
-            $categoryIcons.on('click', function() {
-                const value = $(this).data('value');
-                
-                // Update select value and trigger change
-                $categorySelect.val(value).trigger('change');
-                
-                // Update active state
-                $categoryIcons.removeClass('active');
-                $(this).addClass('active');
-                
-                // Log for debugging
-                console.log('Category changed to:', value);
+        });
+    }
+
+    // Priority Indicators
+    const prioritySelect = document.getElementById('{{ form.priority.id_for_label }}');
+    const priorityIndicators = document.querySelectorAll('.priority-indicator');
+
+    if (prioritySelect && priorityIndicators.length) {
+        const currentPriority = prioritySelect.value;
+        priorityIndicators.forEach(indicator => {
+            if (indicator.dataset.value == currentPriority) {
+                indicator.classList.add('active');
+            }
+        });
+
+        priorityIndicators.forEach(indicator => {
+            indicator.addEventListener('click', function() {
+                const value = this.dataset.value;
+                prioritySelect.value = value;
+                priorityIndicators.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
             });
-            
-            // Also listen for changes on the select itself
-            $categorySelect.on('change', function() {
-                const currentValue = $(this).val();
-                $categoryIcons.each(function() {
-                    if ($(this).data('value') === currentValue) {
-                        $(this).addClass('active');
-                    } else {
-                        $(this).removeClass('active');
-                    }
-                });
-            });
-        }
-        
-        // Handle priority indicators with jQuery
-        const $prioritySelect = $('#{{ form.priority.id_for_label }}');
-        const $priorityIndicators = $('.priority-indicator');
-        
-        // Set initial active state
-        if ($prioritySelect.length > 0 && $priorityIndicators.length > 0) {
-            const currentValue = $prioritySelect.val();
-            $priorityIndicators.each(function() {
-                if ($(this).data('value') === currentValue) {
-                    $(this).addClass('active');
-                }
-            });
-            
-            // Add click handlers
-            $priorityIndicators.on('click', function() {
-                const value = $(this).data('value');
-                
-                // Update select value and trigger change
-                $prioritySelect.val(value).trigger('change');
-                
-                // Update active state
-                $priorityIndicators.removeClass('active');
-                $(this).addClass('active');
-                
-                // Log for debugging
-                console.log('Priority changed to:', value);
-            });
-            
-            // Also listen for changes on the select itself
-            $prioritySelect.on('change', function() {
-                const currentValue = $(this).val();
-                $priorityIndicators.each(function() {
-                    if ($(this).data('value') === currentValue) {
-                        $(this).addClass('active');
-                    } else {
-                        $(this).removeClass('active');
-                    }
-                });
-            });
-        }
-    });
-    
-    // Fallback initialization with jQuery
-    setTimeout(function() {
-        console.log("jQuery fallback initialization");
-        
-        // Check if category icons are initialized
-        if ($('.category-icon-item.active').length === 0) {
-            const currentValue = $('#{{ form.category.id_for_label }}').val();
-            $('.category-icon-item').each(function() {
-                if ($(this).data('value') === currentValue) {
-                    $(this).addClass('active');
-                }
-            });
-        }
-        
-        // Check if priority indicators are initialized
-        if ($('.priority-indicator.active').length === 0) {
-            const currentValue = $('#{{ form.priority.id_for_label }}').val();
-            $('.priority-indicator').each(function() {
-                if ($(this).data('value') === currentValue) {
-                    $(this).addClass('active');
-                }
-            });
-        }
-    }, 500);
+        });
+    }
+});
 </script>
 {% endblock %} 

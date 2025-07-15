@@ -121,6 +121,23 @@ def profile(request):
     
     return render(request, 'core/profile.html', {'form': form})
 
+@login_required
+def backup_database(request):
+    """Create and download a backup of the database."""
+    import shutil
+    from django.http import FileResponse
+    
+    db_path = settings.DATABASES['default']['NAME']
+    backup_path = f"{db_path}.backup"
+    
+    try:
+        shutil.copy(db_path, backup_path)
+        response = FileResponse(open(backup_path, 'rb'), as_attachment=True, filename='db.sqlite3.backup')
+        return response
+    except Exception as e:
+        messages.error(request, f"Error creating backup: {e}")
+        return redirect('profile')
+
 def manifest(request):
     """Return the PWA manifest file."""
     return JsonResponse(
