@@ -41,10 +41,9 @@ html {
 }
 
 @font-face {
-    font-family: 'IRANSans';
-    /*src: url('/static/fonts/IRANSans.woff2') format('woff2'),*/
-    /*     url('/static/fonts/IRANSans.woff') format('woff'),*/
-    /*     url('/static/fonts/irsans.ttf') format('truetype');*/
+    font-family: 'Estedad';
+    src: url('/static/fonts/Estedad-Black.woff2') format('woff2'),
+         url('/static/fonts/Estedad[wght,kshd].woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
@@ -92,7 +91,7 @@ body {
 
 /* Prevent FOIT (Flash of Invisible Text) */
 @font-face {
-    font-family: 'IRANSans';
+    font-family: 'Estedad';
     font-display: swap;
 }
 
