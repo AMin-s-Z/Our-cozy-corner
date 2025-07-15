@@ -41,13 +41,14 @@ html {
 }
 
 @font-face {
-  font-family: 'IRANSans';
- /* برای بارگذاری بهتر فونت */
-}
+  font-family: 'Vazir';
+/*    src: url('/static/fonts/Vazir-Black.woff2') format('woff2'),*/
+/*       url('/static/fonts/Vazir-Black.woff') format('woff');*/
+/}
 
 body {
   /* نام فونت به 'Vazirmatn' تغییر کرد و یک فونت جایگزین مناسب (sans-serif) اضافه شد */
-  font-family: Vazirmatn, sans-serif;
+  font-family: Vazir, sans-serif;
   background-color: #f8f9fa;
   color: var(--dark-color);
   overflow-x: hidden;

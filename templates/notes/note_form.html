@@ -292,6 +292,17 @@
         justify-content: flex-end;
         gap: 10px;
     }
+
+    /* Responsive fix for note content input on mobile */
+    @media (max-width: 600px) {
+        .note-form-container textarea,
+        .note-form-container .django-ckeditor-widget {
+            font-size: 1rem !important;
+            min-height: 120px !important;
+            max-height: 250px !important;
+            width: 100% !important;
+        }
+    }
 </style>
 {% endblock %}
 

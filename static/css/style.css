@@ -42,14 +42,14 @@ html {
 
 @font-face {
     font-family: 'Vazir';
-    src: url('/static/fonts/Vazir-Black.woff2') format('woff2'),
-         url('/static/fonts/Vazir-Black.woff') format('woff');
+    src: url('/static/fonts/Vazir-Light-UI.woff2') format('woff2'),
+         url('/static/fonts/Vazir-Light-UI.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 body {
-    font-family: IRANSans, serif;
+    font-family: Vazir, serif;
     background-color: #f8f9fa;
     color: var(--dark-color);
     overflow-x: hidden;
