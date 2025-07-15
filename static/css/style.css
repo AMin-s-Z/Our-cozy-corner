@@ -80,7 +80,6 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding-top: 60px; /* For fixed navbar */
     padding-bottom: 60px; /* For bottom navigation */
 }
 
@@ -138,7 +137,7 @@ img.rounded-circle {
 @media (display-mode: standalone) {
     /* Styles specific to when the app is installed as PWA */
     .app-container {
-        padding-top: 0;
+        /* No padding needed as navbar is not fixed */
     }
     
     .navbar {

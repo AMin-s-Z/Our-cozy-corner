@@ -41,18 +41,19 @@ html {
 }
 
 @font-face {
-  font-family: 'Vazir';
-/*    src: url('/static/fonts/Vazir-Black.woff2') format('woff2'),*/
-/*       url('/static/fonts/Vazir-Black.woff') format('woff');*/
-/}
+    font-family: 'Vazir';
+    src: url('/static/fonts/Vazir-Light-UI.woff2') format('woff2'),
+         url('/static/fonts/Vazir-Light-UI.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
 
 body {
-  /* نام فونت به 'Vazirmatn' تغییر کرد و یک فونت جایگزین مناسب (sans-serif) اضافه شد */
-  font-family: Vazir, sans-serif;
-  background-color: #f8f9fa;
-  color: var(--dark-color);
-  overflow-x: hidden;
-  text-rendering: optimizeSpeed;
+    font-family: Vazir, serif;
+    background-color: #f8f9fa;
+    color: var(--dark-color);
+    overflow-x: hidden;
+    text-rendering: optimizeSpeed;
 }
 
 /* Modern scrollbar */
@@ -79,7 +80,6 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding-top: 60px; /* For fixed navbar */
     padding-bottom: 60px; /* For bottom navigation */
 }
 
@@ -89,7 +89,10 @@ body {
 }
 
 /* Prevent FOIT (Flash of Invisible Text) */
-
+@font-face {
+    font-family: 'Estedad';
+    font-display: swap;
+}
 
 /* Image optimization */
 img {
@@ -134,7 +137,7 @@ img.rounded-circle {
 @media (display-mode: standalone) {
     /* Styles specific to when the app is installed as PWA */
     .app-container {
-        padding-top: 0;
+        /* No padding needed as navbar is not fixed */
     }
     
     .navbar {
