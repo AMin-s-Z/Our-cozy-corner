@@ -28,7 +28,7 @@ SECRET_KEY = "django-insecure-#04ab($%j@-7n8al-lx6fw5m@#&g22@f7)^qpy=@6!e^wo=kkn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*",'ourcozycorner.runflare.run']
+ALLOWED_HOSTS = ["*",'n8n-cozy.runflare.run']
 
 
 # Application definition
@@ -97,7 +97,7 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-CSRF_TRUSTED_ORIGINS = ['https://ourcozycorner.runflare.run']
+CSRF_TRUSTED_ORIGINS = ['https://n8n-cozy.runflare.run']
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
