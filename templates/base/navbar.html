@@ -34,19 +34,7 @@
                         <i class="fas fa-bullseye me-1"></i> اهداف
                     </a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle {% if '/notes/' in request.path %}active{% endif %}" href="#" id="notesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-sticky-note me-1"></i> یادداشت‌ها
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="notesDropdown">
-                        <li><a class="dropdown-item" href="{% url 'notes:list' %}">همه یادداشت‌ها</a></li>
-                        <li><a class="dropdown-item" href="{% url 'notes:create' %}">ایجاد یادداشت جدید</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'notes:reminders' %}">یادآوری‌ها</a></li>
-                        <li><a class="dropdown-item" href="{% url 'notes:category_list' %}">دسته‌بندی‌ها</a></li>
-                        <li><a class="dropdown-item" href="{% url 'notes:tag_list' %}">برچسب‌ها</a></li>
-                    </ul>
-                </li>
+
                 <li class="nav-item">
                     <a class="nav-link {% if '/moods/' in request.path %}active{% endif %}" href="{% url 'moods:list' %}">
                         <i class="fas fa-heart me-1"></i> حال
@@ -153,6 +141,7 @@
         -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
         transition: all 0.3s ease;
+        z-index: 1040; /* Ensure navbar is above other content */
     }
     
     .navbar.scrolled {
@@ -217,6 +206,7 @@
         box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
         border-radius: 12px;
         overflow: hidden;
+        z-index: 1050;
     }
     
     .notification-item {
@@ -278,6 +268,7 @@
         box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
         border-radius: 12px;
         overflow: hidden;
+        z-index: 1050;
     }
     
     .user-info {

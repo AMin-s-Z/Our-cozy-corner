@@ -1,15 +1,10 @@
 from django.contrib import admin
-from .models import Reward, RewardCategory, RedeemedReward
-
-@admin.register(RewardCategory)
-class RewardCategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'icon']
-    search_fields = ['name']
+from .models import Reward, RedeemedReward
 
 @admin.register(Reward)
 class RewardAdmin(admin.ModelAdmin):
-    list_display = ('title', 'cost', 'category', 'is_active', 'created_at')
-    list_filter = ('is_active', 'category')
+    list_display = ('title', 'cost', 'is_active', 'created_at')
+    list_filter = ('is_active',)
     search_fields = ('title', 'description')
     list_editable = ('cost', 'is_active')
     ordering = ('-created_at',)

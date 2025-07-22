@@ -6,8 +6,8 @@ class Activity(models.Model):
     """A predefined activity that users can complete to earn points."""
     title = models.CharField(_("Title"), max_length=200)
     description = models.TextField(_("Description"), blank=True)
-    points = models.PositiveIntegerField(_("Points"), help_text=_("Points awarded for completing this activity."))
-    is_active = models.BooleanField(_("Active"), default=True, help_text=_("Only active activities can be completed."))
+    points = models.PositiveIntegerField(_("Points"), help_text=_(""))
+    is_active = models.BooleanField(_("Active"), default=True, help_text=_(""))
 
     class Meta:
         verbose_name = _("Activity")

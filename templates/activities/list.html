@@ -54,9 +54,14 @@
 
 {% block content %}
 <div class="container py-4 mb-5">
-    <div class="activities-header">
-        <h2 class="h4 mb-0">انجام فعالیت، کسب امتیاز</h2>
-        <p class="mb-0">با انجام این فعالیت‌ها امتیاز کسب کنید و از فروشگاه جوایز خرید کنید!</p>
+    <div class="activities-header d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="h4 mb-0">انجام فعالیت، کسب امتیاز</h2>
+            <p class="mb-0">با انجام این فعالیت‌ها امتیاز کسب کنید و از فروشگاه جوایز خرید کنید!</p>
+        </div>
+        <a href="{% url 'activities:create' %}" class="btn btn-light rounded-pill">
+            <i class="fas fa-plus me-2"></i> افزودن فعالیت جدید
+        </a>
     </div>
 
     <div class="row">

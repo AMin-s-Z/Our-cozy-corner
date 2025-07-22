@@ -1,5 +1,6 @@
 {% extends 'base/base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}{{ title }} | LoveOur{% endblock %}
 
@@ -37,7 +38,7 @@
                     <label for="{{ form.title.id_for_label }}" class="form-label">عنوان هدف</label>
                     <div class="position-relative">
                         <i class="fas fa-bullseye form-floating-icon"></i>
-                        {{ form.title }}
+                        {{ form.title|add_class:"form-control-icon" }}
                     </div>
                     {% if form.title.errors %}
                         <div class="text-danger mt-1 small">
@@ -53,7 +54,7 @@
                         <label for="{{ form.category.id_for_label }}" class="form-label">دسته‌بندی</label>
                         <div class="position-relative">
                             <i class="fas fa-layer-group form-floating-icon"></i>
-                            {{ form.category }}
+                            {{ form.category|add_class:"form-control-icon" }}
                         </div>
                         <div class="category-icons">
                             <span class="category-icon-item" data-value="relationship" title="رابطه"><i class="fas fa-heart text-danger"></i></span>
@@ -77,7 +78,7 @@
                         <label for="{{ form.priority.id_for_label }}" class="form-label">اولویت</label>
                         <div class="position-relative">
                             <i class="fas fa-flag form-floating-icon"></i>
-                            {{ form.priority }}
+                            {{ form.priority|add_class:"form-control-icon" }}
                         </div>
                         <div class="priority-indicators">
                             <span class="priority-indicator" data-value="1"><i class="fas fa-flag text-muted"></i> کم</span>
@@ -161,10 +162,12 @@
         width: 20px;
         text-align: center;
         font-size: 16px;
+        pointer-events: none; /* Ensure icon doesn't interfere with input */
     }
     
     .form-control-icon {
         padding-right: 45px !important;
+        text-indent: 0; /* Prevent text from shifting into the icon */
     }
     
     .form-range::-webkit-slider-thumb {

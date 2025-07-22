@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     "rewards.apps.RewardsConfig",
     "activities.apps.ActivitiesConfig",
     "notifications.apps.NotificationsConfig",
-    "notes.apps.NotesConfig",
     
     # Third-party apps
     "ckeditor",
@@ -200,7 +199,8 @@ LOGOUT_REDIRECT_URL = 'login'
 MAX_USERS = 2
 
 # Webhook settings for Telegram notifications via n8n
-N8N_WEBHOOK_URL = "https://n8n-xyqzpcgd.eu-central-1.clawcloudrun.com/webhook-test/985867df-ee36-465f-9880-01fcb5db0015"
+# Webhook settings for Telegram notifications via n8n
+N8N_WEBHOOK_URL = "https://n8n-cozy.runflare.run/webhook-test/e616c3a6-0cfc-46bc-abb0-2967b2e17f84"
 
 # Logging configuration
 LOGGING = {

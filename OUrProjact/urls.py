@@ -37,7 +37,6 @@ urlpatterns = [
     path("rewards/", include("rewards.urls")),
     path("activities/", include("activities.urls")),
     path("notifications/", include("notifications.urls")),
-    path("notes/", include("notes.urls")),
     
     # PWA URLs
     path('manifest.json', core_views.manifest, name='manifest'),

@@ -17,3 +17,12 @@ def replace(value, arg):
     
     old, new = arg.split(',', 1)
     return str(value).replace(old, new)
+
+@register.filter
+def add_class(field, css_class):
+    """
+    Add a CSS class to the form field.
+    
+    Usage: {{ form.field|add_class:"form-control" }}
+    """
+    return field.as_widget(attrs={"class": f"{field.field.widget.attrs.get('class', '')} {css_class}".strip()})

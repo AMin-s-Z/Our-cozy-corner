@@ -114,7 +114,12 @@
     </div>
 
     <!-- Available Rewards -->
-    <h3 class="section-title">جوایز موجود</h3>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="section-title mb-0">جوایز موجود</h3>
+        <a href="{% url 'rewards:create' %}" class="btn btn-primary rounded-pill">
+            <i class="fas fa-plus me-2"></i> افزودن جایزه جدید
+        </a>
+    </div>
     <div class="row">
         {% for reward in available_rewards %}
         <div class="col-md-6 col-lg-4">

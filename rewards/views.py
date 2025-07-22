@@ -54,10 +54,6 @@ def redeem_reward(request, pk):
 @login_required
 def reward_create(request):
     """Create a new reward for the shop."""
-    if not request.user.is_staff:
-        messages.error(request, _("You do not have permission to create rewards."))
-        return redirect('rewards:list')
-
     if request.method == 'POST':
         form = RewardForm(request.POST)
         if form.is_valid():
@@ -76,9 +72,6 @@ def reward_create(request):
 def reward_edit(request, pk):
     """Edit an existing reward."""
     reward = get_object_or_404(Reward, pk=pk)
-    if not request.user.is_staff:
-        messages.error(request, _("You do not have permission to edit rewards."))
-        return redirect('rewards:list')
     
     if request.method == 'POST':
         form = RewardForm(request.POST, instance=reward)
@@ -100,9 +93,6 @@ def reward_edit(request, pk):
 def reward_delete(request, pk):
     """Delete a reward."""
     reward = get_object_or_404(Reward, pk=pk)
-    if not request.user.is_staff:
-        messages.error(request, _("You do not have permission to delete rewards."))
-        return redirect('rewards:list')
     
     if request.method == 'POST':
         reward.delete()

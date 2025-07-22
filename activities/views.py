@@ -50,6 +50,26 @@ def activity_list(request):
     }
     return render(request, 'activities/list.html', context)
 
+from .forms import ActivityForm
+
+@login_required
+def activity_create(request):
+    """Create a new activity."""
+    if request.method == 'POST':
+        form = ActivityForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "فعالیت با موفقیت ایجاد شد.")
+            return redirect('activities:list')
+    else:
+        form = ActivityForm()
+    
+    context = {
+        'form': form,
+        'title': "ایجاد فعالیت"
+    }
+    return render(request, 'activities/form.html', context)
+
 @login_required
 def complete_activity(request, pk):
     """Marks an activity as complete for the current user and awards points."""

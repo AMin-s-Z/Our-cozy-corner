@@ -26,14 +26,7 @@
                     <div class="nav-text">اهداف</div>
                 </a>
             </div>
-            <div class="col text-center">
-                <a href="{% url 'notes:list' %}" class="bottom-nav-item {% if '/notes/' in request.path %}active{% endif %}">
-                    <div class="icon-container">
-                        <i class="fas fa-sticky-note"></i>
-                    </div>
-                    <div class="nav-text">یادداشت‌ها</div>
-                </a>
-            </div>
+
             <div class="col text-center">
                 <a href="{% url 'moods:list' %}" class="bottom-nav-item {% if '/moods/' in request.path %}active{% endif %}">
                     <div class="icon-container">
